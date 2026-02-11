@@ -1,6 +1,19 @@
 version: 2
 
 sources:
+  - name: tpch
+    description: Snowflake Sample Data - TPC-H
+    database: SNOWFLAKE_SAMPLE_DATA
+    schema: TPCH_SF1
+    
+    tables:
+      - name: customer
+        description: TPC-H 客户表
+      - name: orders
+        description: TPC-H 订单表
+      - name: lineitem
+        description: TPC-H 订单明细表
+
   - name: analytics
     description: QuickSight 分析数据源表
     database: QUICKSIGHT_DB
