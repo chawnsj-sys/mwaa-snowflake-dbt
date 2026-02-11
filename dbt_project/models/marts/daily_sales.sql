@@ -1,6 +1,12 @@
 -- Marts 层：每日销售汇总表
 -- 按日期统计订单和销售数据
 
+{{ config(
+    materialized='table',
+    schema='analytics',
+    tags=['marts']
+) }}
+
 with orders as (
     select * from {{ ref('stg_orders') }}
 ),

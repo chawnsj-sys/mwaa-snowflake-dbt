@@ -1,6 +1,12 @@
 -- Marts 层：客户汇总分析表
 -- 整合客户信息和订单统计
 
+{{ config(
+    materialized='table',
+    schema='analytics',
+    tags=['marts']
+) }}
+
 with customers as (
     select * from {{ ref('stg_customers') }}
 ),

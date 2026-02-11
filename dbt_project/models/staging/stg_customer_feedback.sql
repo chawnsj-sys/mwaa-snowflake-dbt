@@ -3,7 +3,8 @@
 
 {{ config(
     materialized='view',
-    schema='analytics'
+    schema='analytics',
+    tags=['staging']
 ) }}
 
 select 

@@ -1,5 +1,11 @@
 -- Staging 层：清洗和标准化订单明细数据
 
+{{ config(
+    materialized='view',
+    schema='analytics',
+    tags=['staging']
+) }}
+
 with source as (
     select * from {{ source('analytics', 'order_items') }}
 ),

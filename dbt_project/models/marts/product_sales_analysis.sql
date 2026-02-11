@@ -3,7 +3,8 @@
 
 {{ config(
     materialized='table',
-    schema='analytics'
+    schema='analytics',
+    tags=['marts']
 ) }}
 
 with products as (
