@@ -1,0 +1,7 @@
+# MWAA 2.10.3 依赖配置
+# 注意: dbt-snowflake 通过 startup.sh 安装到虚拟环境，避免依赖冲突
+
+--constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.3/constraints-3.11.txt"
+
+apache-airflow-providers-snowflake==5.8.0
+astronomer-cosmos==1.8.0

@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: customer_summary
+    description: 客户汇总分析表，整合客户信息和订单统计
+    columns:
+      - name: customer_id
+        description: 客户唯一标识
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: 客户姓名
+      - name: total_orders
+        description: 总订单数
+        tests:
+          - not_null
+      - name: completed_orders
+        description: 已完成订单数
+      - name: total_spent
+        description: 总消费金额
+        tests:
+          - not_null
+      - name: avg_order_value
+        description: 平均订单金额
+      - name: customer_segment
+        description: 客户分类（No Orders, One-time, Regular, VIP）
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['No Orders', 'One-time', 'Regular', 'VIP']
+      - name: dbt_updated_at
+        description: dbt 更新时间戳
+        tests:
+          - not_null
+  
+  - name: daily_sales
+    description: 每日销售汇总表，按日期统计订单和销售数据
+    columns:
+      - name: order_date
+        description: 订单日期
+        tests:
+          - unique
+          - not_null
+      - name: total_orders
+        description: 当日总订单数
+        tests:
+          - not_null
+      - name: unique_customers
+        description: 当日独立客户数
+        tests:
+          - not_null
+      - name: total_revenue
+        description: 当日总收入（仅已完成订单）
+        tests:
+          - not_null
+      - name: completion_rate
+        description: 订单完成率（百分比）
+      - name: dbt_updated_at
+        description: dbt 更新时间戳
+        tests:
+          - not_null

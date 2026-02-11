@@ -1,0 +1,43 @@
+# dbt 项目配置文件
+name: 'quicksight_analytics'
+version: '1.0.0'
+config-version: 2
+
+# 项目配置
+profile: 'quicksight_analytics'
+
+# 模型路径
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# 编译输出路径
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# 模型配置
+models:
+  quicksight_analytics:
+    # Staging 层配置
+    staging:
+      +materialized: view
+      +schema: staging
+      
+    # Marts 层配置
+    marts:
+      +materialized: table
+      +schema: marts
+
+# 测试配置
+tests:
+  +store_failures: true
+  +schema: test_results
+
+# 变量
+vars:
+  lookback_days: 7
