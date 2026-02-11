@@ -14,8 +14,8 @@ select
     order_date,
     count(distinct order_id) as total_orders,
     count(distinct customer_id) as unique_customers,
-    sum(total_price) as total_revenue,
-    avg(total_price) as avg_order_value
+    sum(total_amount) as total_revenue,
+    avg(total_amount) as avg_order_value
 from orders
-where order_date >= '1995-01-01'
+where status = '已完成'
 group by order_date

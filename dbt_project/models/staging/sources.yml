@@ -90,3 +90,39 @@ sources:
             description: 单价
             tests:
               - not_null
+      
+      - name: products
+        description: 产品信息表
+        columns:
+          - name: product_id
+            description: 产品唯一标识
+            tests:
+              - unique
+              - not_null
+          - name: product_name
+            description: 产品名称
+          - name: category
+            description: 产品类别
+          - name: price
+            description: 销售价格
+          - name: cost
+            description: 成本价格
+      
+      - name: customer_feedback
+        description: 客户反馈表
+        columns:
+          - name: feedback_id
+            description: 反馈唯一标识
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: 客户 ID
+          - name: order_id
+            description: 订单 ID
+          - name: rating
+            description: 评分 (1-5)
+          - name: comment
+            description: 反馈评论
+          - name: feedback_date
+            description: 反馈日期
