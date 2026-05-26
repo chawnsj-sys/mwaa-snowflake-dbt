@@ -39,7 +39,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['pending', 'completed', 'cancelled']
+              arguments:
+                values: ['pending', 'completed', 'cancelled']
       - name: total_amount
         description: 订单总金额
         tests:

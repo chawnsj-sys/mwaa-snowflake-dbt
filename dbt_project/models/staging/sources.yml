@@ -126,3 +126,24 @@ sources:
             description: 反馈评论
           - name: feedback_date
             description: 反馈日期
+
+      - name: promotions
+        description: 促销活动表
+        columns:
+          - name: promotion_id
+            description: 促销活动唯一标识
+            tests:
+              - unique
+              - not_null
+          - name: product_id
+            description: 关联产品 ID
+            tests:
+              - not_null
+          - name: promotion_name
+            description: 促销活动名称
+          - name: discount_percent
+            description: 折扣百分比
+          - name: start_date
+            description: 开始日期
+          - name: end_date
+            description: 结束日期

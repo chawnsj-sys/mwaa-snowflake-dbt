@@ -4,3 +4,4 @@ logs/
 *.log
 .env
 profiles.yml
+dbt_internal_packages/

@@ -40,4 +40,4 @@ tests:
 
 # 变量
 vars:
-  lookback_days: 7
+  lookback_days: 30
