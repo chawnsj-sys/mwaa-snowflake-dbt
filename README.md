@@ -1,262 +1,177 @@
-# MWAA Snowflake DataOps 项目
+# DataOps: MWAA + dbt + Snowflake
 
-基于 Amazon MWAA (Managed Workflows for Apache Airflow) 和 Snowflake 的配置驱动 DataOps 框架。
+基于 AWS MWAA、dbt Core、Astronomer Cosmos 和 Snowflake 构建的数据转换管道。
 
-## 🚀 核心特性
+## 技术组件
 
-- **dbt + Cosmos 集成**：行业标准的数据转换工具 + 最佳的 Airflow 集成方式
-- **自动任务生成**：每个 dbt 模型自动变成独立的 Airflow 任务
-- **完整的可观测性**：在 Airflow UI 中看到每个模型的状态和依赖关系
-- **灵活的重试**：单个模型失败可以单独重试，不需要重跑整个流程
-- **自动依赖管理**：dbt 的 `ref()` 自动转换为 Airflow 任务依赖
-- **内置测试框架**：数据质量测试自动集成到 Airflow 中
-- **完整的 CI/CD**：一键同步到 MWAA，自动部署
+| 组件 | 技术 | 用途 |
+|------|------|------|
+| 数据仓库 | Snowflake | 数据存储和计算引擎 |
+| 数据转换 | dbt Core | SQL 模型化转换（staging → marts 分层） |
+| 调度编排 | Amazon MWAA + Cosmos | 自动解析 dbt 模型为 Airflow Tasks |
+| CI/CD | GitHub Actions + OIDC | push 到 main 自动部署到 MWAA |
+| SQL 开发 | Snowflake Notebook/Workspace | 即时验证 SQL 逻辑 |
+| 本地 IDE | Kiro / VSCode + dbt Power User | 模型编辑、编译、运行 |
+| 版本控制 | GitHub | 代码管理，Snowflake Git 集成 |
 
-## 📁 项目结构
+## 架构图
 
 ```
-mwaa_snowflake/
-├── dags/                                    # Airflow DAG 文件
-│   ├── snowflake_test.py                   # Snowflake 连接测试
-│   └── dbt_quicksight_analytics_cosmos.py  # dbt + Cosmos DAG ⭐
-├── dbt_project/                            # dbt 项目
-│   ├── dbt_project.yml                     # dbt 配置
-│   ├── profiles.yml                        # Snowflake 连接配置
-│   └── models/                             # dbt 模型
-│       ├── staging/                        # Staging 层（数据清洗）
-│       │   ├── sources.yml                 # 源表定义
-│       │   ├── stg_customers.sql
-│       │   ├── stg_orders.sql
-│       │   └── stg_order_items.sql
-│       └── marts/                          # Marts 层（业务分析）
-│           ├── customer_summary.sql
-│           ├── daily_sales.sql
-│           └── marts_models.yml
-├── requirements/                           # Python 依赖
-│   └── requirements.txt                    # dbt-snowflake + Cosmos
-├── scripts/                                # 工具脚本
-│   └── create_snowflake_connection.sh
-└── .kiro/steering/                        # 项目文档
+Snowflake Notebook (SQL 开发验证)
+        ↓ Git Push
+GitHub (中央仓库)
+        ↓ git pull
+Kiro / VSCode (AI 翻译 SQL → dbt 模型)
+        ↓ git push
+GitHub Actions (OIDC 认证 → aws s3 sync)
+        ↓ 30 秒自动检测
+MWAA + Cosmos (自动调度 dbt 模型)
+        ↓ 执行到 Snowflake
+QuickSight (BI 消费)
 ```
 
-## ⚡ 快速开始
+## 快速开始（新成员）
 
-### 步骤 1：创建 dbt 模型
+### 前提条件
+
+- Snowflake 账号（联系管理员获取）
+- GitHub 仓库访问权限
+- AWS CLI 已配置
+- Python 3.11+
+- dbt-snowflake 已安装：`pip install dbt-snowflake`
+
+### Step 1：克隆仓库
 
 ```bash
-# 在 dbt_project/models/marts/ 创建新模型
-cat > dbt_project/models/marts/my_analysis.sql << 'EOF'
--- 使用 ref() 引用其他模型
-with customers as (
-    select * from {{ ref('stg_customers') }}
-),
-
-orders as (
-    select * from {{ ref('stg_orders') }}
-)
-
-select
-    c.customer_id,
-    c.customer_name,
-    count(o.order_id) as total_orders
-from customers c
-left join orders o on c.customer_id = o.customer_id
-group by c.customer_id, c.customer_name
-EOF
+git clone https://github.com/chawnsj-sys/mwaa-snowflake-dbt.git
+cd mwaa-snowflake-dbt
 ```
 
-### 步骤 2：本地测试（可选）
-
-```bash
-# 安装 dbt
-pip install dbt-snowflake
-
-# 配置环境变量
-export SNOWFLAKE_ACCOUNT="ZRRXEFT-AGB52047"
-export SNOWFLAKE_USER="shenjin"
-export SNOWFLAKE_PASSWORD="your_password"
-
-# 测试
-cd dbt_project
-dbt run --select my_analysis
-```
-
-### 步骤 3：部署到 MWAA
-
-```bash
-# 同步到 S3
-./sync.sh
-
-# 等待 20-30 分钟（首次需要安装依赖）
-./check-mwaa-status.sh
-
-# 在 Airflow UI 中查看
-# https://166710d9-9c44-40bb-b0b8-f186b3cb1d94.c71.airflow.us-east-1.on.aws
-# 找到 DAG: dbt_quicksight_analytics_cosmos
-# 你会看到每个 dbt 模型都是独立的任务！
-```
-
-### 步骤 4：触发运行
-
-在 Airflow UI 中：
-1. 找到 `dbt_quicksight_analytics_cosmos`
-2. 点击 Graph View 查看任务依赖关系
-3. 点击播放按钮 ▶️ 触发运行
-4. 观察每个模型的执行状态
-
-## 🛠️ 常用命令
-
-```bash
-# 同步文件到 S3
-./sync.sh
-
-# 检查 MWAA 环境状态
-./check-mwaa-status.sh
-
-# 触发 DAG 运行
-./trigger-dag.sh dbt_quicksight_analytics_cosmos
-
-# 实时监控 DAG 执行
-./watch-dag-execution.sh
-
-# 本地测试 dbt
-cd dbt_project
-dbt run                    # 运行所有模型
-dbt run --select staging.* # 只运行 staging 层
-dbt test                   # 运行所有测试
-dbt docs generate          # 生成文档
-```
-
-## 📊 MWAA 环境信息
-
-- **环境名称**: mwaa-snowflake-test
-- **Airflow 版本**: 2.10.3
-- **区域**: us-east-1
-- **S3 桶**: mwaa-snowflake-dags-782683897770
-- **Web UI**: https://166710d9-9c44-40bb-b0b8-f186b3cb1d94.c71.airflow.us-east-1.on.aws
-
-## 🔧 Snowflake 连接配置
-
-在 Airflow UI 中配置 Snowflake 连接：
-
-```
-Connection ID:   snowflake_default
-Connection Type: Snowflake
-Account:         ZRRXEFT-AGB52047
-Database:        SNOWFLAKE_SAMPLE_DATA
-Warehouse:       COMPUTE_WH
-Role:            ACCOUNTADMIN
-```
-
-详细配置：`.kiro/steering/snowflake.md`
-
-## 📚 文档
-
-### 核心指南
-- **[COSMOS_GUIDE.md](COSMOS_GUIDE.md)** - Astronomer Cosmos 完整指南 ⭐
-- **[DBT_SQL_GUIDE.md](DBT_SQL_GUIDE.md)** - dbt SQL 写法指南
-- **[DBT_INTEGRATION_GUIDE.md](DBT_INTEGRATION_GUIDE.md)** - dbt + MWAA + Snowflake 集成
-- **[SNOWFLAKE_DBT_COMPARISON.md](SNOWFLAKE_DBT_COMPARISON.md)** - Snowflake 原生 dbt vs 开源 dbt 对比 ⭐
-
-### 项目状态
-- [项目总结](PROJECT_SUMMARY.md) - 已完成的工作
-- [经验教训](LESSON_LEARNED.md) - Snowflake Temporary Tables 的坑
-
-### 最佳实践
-- [MWAA CI/CD 最佳实践](.kiro/steering/mwaa-cicd-best-practices.md)
-- [故障排查指南](TROUBLESHOOTING.md)
-
-### 配置参考
-- [Snowflake 配置](.kiro/steering/snowflake.md)
-
-## 🎯 开发流程
-
-### 1. 创建 dbt 模型
-
-在 `dbt_project/models/` 创建 SQL 文件：
-
-```sql
--- models/marts/my_model.sql
-with source_data as (
-    select * from {{ ref('stg_customers') }}
-)
-
-select
-    customer_id,
-    customer_name,
-    count(*) as metric
-from source_data
-group by customer_id, customer_name
-```
-
-### 2. 添加测试
-
-在对应的 YAML 文件中添加测试：
-
-```yaml
-# models/marts/marts_models.yml
-models:
-  - name: my_model
-    columns:
-      - name: customer_id
-        tests:
-          - unique
-          - not_null
-```
-
-### 3. 本地测试（可选）
+### Step 2：配置本地 dbt 连接
 
 ```bash
 cd dbt_project
-dbt run --select my_model
-dbt test --select my_model
+cp .env.example .env
+# 编辑 .env 填入你的 Snowflake 凭证：
+# export SNOWFLAKE_ACCOUNT="RUKQCBI-WS06286"
+# export SNOWFLAKE_USER="你的用户名"
+# export SNOWFLAKE_PASSWORD="你的密码"
 ```
 
-### 4. 部署到 MWAA
+### Step 3：验证连接
 
 ```bash
-./sync.sh
+source .env
+dbt debug --profiles-dir .
 ```
 
-### 5. 在 Airflow UI 中查看
+看到 `All checks passed!` 即可。
 
-- Cosmos 自动为你的新模型创建 Airflow 任务
-- 依赖关系自动推断
-- 无需修改 DAG 文件！
+### Step 4：编译和运行
 
-## ⚠️ 重要提示
-
-- **DAG 更新**：几分钟内生效
-- **Requirements 更新**：需要 20-30 分钟（触发环境更新）
-- **使用 Constraints 文件**：避免版本冲突
-- **启用日志**：便于排查问题
-
-## 🔍 故障排查
-
-### 常见问题
-
-**Q: DAG 未显示？**
 ```bash
-# 查看 DAG 处理日志
-aws logs tail airflow-mwaa-snowflake-test-DAGProcessing --since 10m --region us-east-1
+dbt compile --profiles-dir .    # 编译检查
+dbt run --profiles-dir .        # 运行全部模型到 Snowflake
+dbt test --profiles-dir .       # 运行数据测试
 ```
 
-**Q: 任务执行失败？**
+### Step 5：部署
+
 ```bash
-# 查看 Worker 日志
-./watch-dag-execution.sh
+git add -A
+git commit -m "your changes"
+git push origin main
+# GitHub Actions 自动部署到 MWAA ✅
 ```
 
-**Q: 依赖安装失败？**
-- 检查是否使用了 constraints 文件
-- 查看 Scheduler 日志中的 pip install 错误
+## 开发流程
 
-详细排查：[TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+### 日常开发
 
-## 🤝 贡献
+1. **Snowflake Notebook** - 写 SQL，验证逻辑正确
+2. **推送到 GitHub** - Notebook → Git Push
+3. **本地 Kiro/VSCode** - `git pull` → 翻译为 dbt 模型 → `dbt compile` → `dbt run`
+4. **git push** - GitHub Actions 自动部署到 MWAA
 
-欢迎提交 Issue 和 Pull Request！
+详细流程见 [docs/DEV_FLOW_DEMO.md](docs/DEV_FLOW_DEMO.md)
 
-## 📄 许可
+### dbt 模型规范
 
-MIT License
+- **Staging 模型**（Silver 层）：`models/staging/stg_*.sql`，物化为 view
+- **Marts 模型**（Gold 层）：`models/marts/*.sql`，物化为 table
+- 所有模型必须添加 `tags` 配置（`staging` 或 `marts`）
+- 使用 `{{ source() }}` 引用源表，`{{ ref() }}` 引用其他模型
+
+### DAG 调度
+
+- DAG：`dbt_quicksight_analytics_cosmos`
+- 调度：每日 08:00 UTC
+- 结构：`start → dbt_models → end`
+- Cosmos 自动根据 dbt 依赖关系编排任务
+
+## 项目结构
+
+```
+mwaa-snowflake-dbt/
+├── .github/workflows/          # CI/CD（GitHub Actions）
+│   └── deploy-to-mwaa.yml
+├── dags/                       # Airflow DAG 文件
+│   └── dbt_quicksight_analytics_cosmos.py
+├── dbt_project/                # dbt 项目（核心）
+│   ├── models/
+│   │   ├── staging/            # Silver 层（view）
+│   │   └── marts/              # Gold 层（table）
+│   ├── dbt_project.yml
+│   └── profiles.yml
+├── notebooks/                  # Snowflake Notebook SQL（验证用）
+├── scripts/                    # 初始化和运维脚本
+│   ├── init_snowflake.sql      # Snowflake 环境初始化
+│   ├── init_github_actions.sh  # CI/CD 配置
+│   └── startup.sh              # MWAA 启动脚本
+├── requirements/
+│   └── requirements.txt        # MWAA Python 依赖
+├── docs/                       # 文档
+│   ├── DEV_FLOW_DEMO.md        # 开发流程详细说明
+│   ├── MWAA_SETUP_GUIDE.md     # MWAA 环境搭建指南
+│   └── research/               # 研究参考资料
+└── README.md                   # 本文件
+```
+
+## 环境搭建（管理员）
+
+如果需要从零搭建整个环境：
+
+1. **Snowflake 初始化** - 执行 `scripts/init_snowflake.sql`（创建数据库、表、Git 集成）
+2. **MWAA 环境** - 参考 [docs/MWAA_SETUP_GUIDE.md](docs/MWAA_SETUP_GUIDE.md)
+3. **GitHub Actions CI/CD** - 执行 `bash scripts/init_github_actions.sh`
+4. **Snowflake Connection** - 在 MWAA Airflow UI 配置 `snowflake_default`
+
+## 常用命令
+
+```bash
+# 本地开发
+source dbt_project/.env
+cd dbt_project
+dbt compile --profiles-dir .              # 编译
+dbt run --select model_name --profiles-dir .  # 运行单个模型
+dbt run --profiles-dir .                  # 运行全部
+dbt test --profiles-dir .                 # 测试
+
+# 部署（自动）
+git push origin main                      # 触发 GitHub Actions
+
+# 检查 MWAA 状态
+aws mwaa get-environment --name mwaa-snowflake-test --region us-east-1 --query 'Environment.Status'
+
+# 清除 Cosmos 缓存（新增/删除模型后）
+aws s3 rm s3://mwaa-snowflake-dags-782683897770/cosmos-cache/ --recursive --region us-east-1
+```
+
+## 参考资料
+
+- [Build data pipelines with dbt using MWAA and Cosmos](https://aws.amazon.com/blogs/big-data/build-data-pipelines-with-dbt-in-amazon-redshift-using-amazon-mwaa-and-cosmos/) (AWS, 2025)
+- [Deploying to MWAA with CI/CD tools](https://aws.amazon.com/blogs/opensource/deploying-to-amazon-managed-workflows-for-apache-airflow-with-ci-cd-tools/) (AWS, 2024)
+- [Amazon MWAA best practices for Python dependencies](https://aws.amazon.com/blogs/big-data/amazon-mwaa-best-practices-for-managing-python-dependencies/) (AWS, 2024)
+- [Use Snowflake with Amazon MWAA](https://aws.amazon.com/blogs/big-data/use-snowflake-with-amazon-mwaa-to-orchestrate-data-pipelines/) (AWS, 2023)
+- [Cosmos Getting Started on MWAA](https://astronomer.github.io/astronomer-cosmos/getting_started/mwaa.html) (Astronomer)
+- [Exploring dbt Projects on Snowflake](https://www.snowflake.com/en/developers/guides/dbt-projects-on-snowflake/) (Snowflake)
