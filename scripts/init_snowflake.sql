@@ -216,3 +216,20 @@ SHOW GIT BRANCHES IN QUICKSIGHT_DB.ANALYTICS.MWAA_SNOWFLAKE_DBT_REPO;
 -- ALTER GIT REPOSITORY QUICKSIGHT_DB.ANALYTICS.MWAA_SNOWFLAKE_DBT_REPO FETCH;
 -- 查看文件列表
 -- LS @QUICKSIGHT_DB.ANALYTICS.MWAA_SNOWFLAKE_DBT_REPO/branches/main/;
+
+-- ============================================
+-- 7. CI/CD 配置（GitHub Actions）
+-- ============================================
+-- 说明：配置 GitHub Actions 自动部署 DAG 和 dbt 模型到 MWAA S3
+-- 运行脚本：bash scripts/init_github_actions.sh
+--
+-- 原理：
+--   git push → GitHub Actions 触发 → OIDC 认证 → aws s3 sync → MWAA 自动检测
+--
+-- 配置内容：
+--   1. AWS OIDC Identity Provider（让 GitHub 能 assume IAM Role）
+--   2. IAM Role: github-actions-mwaa-deploy（只有 S3 写入权限）
+--   3. .github/workflows/deploy-to-mwaa.yml（工作流定义）
+--
+-- 触发条件：push 到 main 分支且修改了 dags/、dbt_project/、requirements/ 目录
+-- 安全性：使用 OIDC 临时 token，无需存储 AWS 密钥

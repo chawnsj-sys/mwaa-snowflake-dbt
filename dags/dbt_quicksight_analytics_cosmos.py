@@ -1,9 +1,8 @@
 """
 dbt QuickSight Analytics DAG - 使用 Astronomer Cosmos
 
-Cosmos 自动将每个 dbt 模型转换为独立的 Airflow 任务
-使用 DbtTaskGroup 分层管理 staging 和 marts 模型
-启用 emit_datasets 增强数据血缘可观测性
+精简版：只运行 3 个核心模型用于快速测试
+stg_customers → stg_orders → customer_summary
 """
 
 import os
@@ -26,8 +25,7 @@ if MWAA_DBT_PATH.exists():
 else:
     DBT_PROJECT_PATH = EC2_DBT_PATH
 
-# dbt 可执行文件路径 - MWAA 使用 startup.sh 安装到虚拟环境
-# EC2 测试环境使用 .local/bin/dbt
+# dbt 可执行文件路径
 DBT_EXECUTABLE_PATH = os.environ.get(
     "DBT_VENV_PATH", 
     "/usr/local/airflow/.local"
@@ -62,14 +60,14 @@ default_args = {
     "depends_on_past": False,
     "email_on_failure": False,
     "email_on_retry": False,
-    "retries": 2,
-    "retry_delay": timedelta(minutes=5),
+    "retries": 1,
+    "retry_delay": timedelta(minutes=2),
 }
 
 # 创建 DAG
 with DAG(
     dag_id="dbt_quicksight_analytics_cosmos",
-    description="使用 Cosmos 运行 dbt QuickSight 分析 (分层架构)",
+    description="Cosmos dbt 快速测试 (3 个核心模型)",
     start_date=days_ago(1),
     schedule_interval="0 8 * * *",
     catchup=False,
@@ -81,39 +79,21 @@ with DAG(
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")
 
-    # Silver 层 - 数据清洗和标准化
-    silver = DbtTaskGroup(
-        group_id="silver_models",
+    # 只运行 3 个核心模型：stg_customers, stg_orders, customer_summary
+    dbt_models = DbtTaskGroup(
+        group_id="dbt_models",
         project_config=PROJECT_CONFIG,
         profile_config=PROFILE_CONFIG,
         execution_config=EXECUTION_CONFIG,
         render_config=RenderConfig(
-            select=["tag:staging"],
-            emit_datasets=True,  # 启用数据血缘追踪
+            select=["stg_customers", "stg_orders", "customer_summary"],
+            emit_datasets=True,
         ),
         operator_args={
             "install_deps": True,
             "full_refresh": False,
-            "execution_timeout": timedelta(minutes=15),
+            "execution_timeout": timedelta(minutes=10),
         },
     )
 
-    # Gold 层 - 业务聚合和分析
-    gold = DbtTaskGroup(
-        group_id="gold_models",
-        project_config=PROJECT_CONFIG,
-        profile_config=PROFILE_CONFIG,
-        execution_config=EXECUTION_CONFIG,
-        render_config=RenderConfig(
-            select=["tag:marts"],
-            emit_datasets=True,  # 启用数据血缘追踪
-            dbt_deps=False,  # silver 已安装依赖
-        ),
-        operator_args={
-            "install_deps": False,
-            "full_refresh": False,
-            "execution_timeout": timedelta(minutes=30),
-        },
-    )
-
-    start >> silver >> gold >> end
+    start >> dbt_models >> end
