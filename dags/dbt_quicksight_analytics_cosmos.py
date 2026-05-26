@@ -1,8 +1,8 @@
 """
 dbt QuickSight Analytics DAG - 使用 Astronomer Cosmos
 
-精简版：只运行 3 个核心模型用于快速测试
-stg_customers → stg_orders → customer_summary
+分层架构：Silver (staging) → Gold (marts)
+精选 5-6 个核心模型用于演示
 """
 
 import os
@@ -67,7 +67,7 @@ default_args = {
 # 创建 DAG
 with DAG(
     dag_id="dbt_quicksight_analytics_cosmos",
-    description="Cosmos dbt 快速测试 (3 个核心模型)",
+    description="Cosmos dbt 分层架构 (Silver → Gold)",
     start_date=days_ago(1),
     schedule_interval="0 8 * * *",
     catchup=False,
@@ -79,14 +79,14 @@ with DAG(
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")
 
-    # 只运行 3 个核心模型：stg_customers, stg_orders, customer_summary
-    dbt_models = DbtTaskGroup(
-        group_id="dbt_models",
+    # Silver 层 - 数据清洗（3 个 staging 模型）
+    silver = DbtTaskGroup(
+        group_id="silver_models",
         project_config=PROJECT_CONFIG,
         profile_config=PROFILE_CONFIG,
         execution_config=EXECUTION_CONFIG,
         render_config=RenderConfig(
-            select=["stg_customers", "stg_orders", "customer_summary"],
+            select=["stg_customers", "stg_orders", "stg_order_items"],
             emit_datasets=True,
         ),
         operator_args={
@@ -96,4 +96,21 @@ with DAG(
         },
     )
 
-    start >> dbt_models >> end
+    # Gold 层 - 业务聚合（2-3 个 marts 模型）
+    gold = DbtTaskGroup(
+        group_id="gold_models",
+        project_config=PROJECT_CONFIG,
+        profile_config=PROFILE_CONFIG,
+        execution_config=EXECUTION_CONFIG,
+        render_config=RenderConfig(
+            select=["customer_summary", "daily_sales"],
+            emit_datasets=True,
+        ),
+        operator_args={
+            "install_deps": False,
+            "full_refresh": False,
+            "execution_timeout": timedelta(minutes=10),
+        },
+    )
+
+    start >> silver >> gold >> end

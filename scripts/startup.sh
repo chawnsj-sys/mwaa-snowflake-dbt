@@ -19,11 +19,10 @@ else
 fi
 
 # === Cosmos 缓存配置（加速 DAG 解析）===
-export AIRFLOW__COSMOS__CACHE_DIR="${AIRFLOW_HOME}/dags/cosmos_cache"
+export AIRFLOW__COSMOS__CACHE_DIR="/tmp/cosmos_cache"
 export AIRFLOW__COSMOS__ENABLE_CACHE="True"
 export AIRFLOW__COSMOS__ENABLE_CACHE_DBT_LS="True"
 
 # === Cosmos 性能优化 ===
-# 使用 DBT_LS_CACHE 模式，避免每次解析都运行 dbt ls
-export AIRFLOW__COSMOS__DBT_DOCS_DIR="${AIRFLOW_HOME}/dags/cosmos_docs"
+export AIRFLOW__COSMOS__DBT_DOCS_DIR="/tmp/cosmos_docs"
 export AIRFLOW__COSMOS__PROPAGATE_LOGS="True"
