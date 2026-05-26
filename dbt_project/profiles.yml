@@ -1,0 +1,32 @@
+# dbt Snowflake 连接配置
+# dev: 本地开发，写入 DEV schema（不影响生产）
+# prod: MWAA 生产调度，写入 PUBLIC schema
+
+quicksight_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: ACCOUNTADMIN
+      database: QUICKSIGHT_DB
+      warehouse: COMPUTE_WH
+      schema: DEV
+      threads: 4
+      client_session_keep_alive: False
+      query_tag: dbt_quicksight_dev
+      
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: ACCOUNTADMIN
+      database: QUICKSIGHT_DB
+      warehouse: COMPUTE_WH
+      schema: PUBLIC
+      threads: 8
+      client_session_keep_alive: False
+      query_tag: dbt_quicksight_prod
