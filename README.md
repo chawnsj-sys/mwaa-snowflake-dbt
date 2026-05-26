@@ -106,8 +106,24 @@ git push origin main
 
 - DAG：`dbt_quicksight_analytics_cosmos`
 - 调度：每日 08:00 UTC
-- 结构：`start → dbt_models → end`
+- 结构：`start → silver_models → gold_models → end`
+- 总耗时约 3 分钟
+
+```
+start
+  → silver_models (Silver 层 - 数据清洗)
+      stg_customers (view)
+      stg_orders (view)
+      stg_order_items (view)
+  → gold_models (Gold 层 - 业务聚合)
+      customer_summary (table)
+      daily_sales (table)
+  → end
+```
+
 - Cosmos 自动根据 dbt 依赖关系编排任务
+- 启用 emit_datasets 数据血缘追踪
+- Cosmos 缓存目录：`/tmp/cosmos_cache`（加速 DAG 解析）
 
 ## 项目结构
 
