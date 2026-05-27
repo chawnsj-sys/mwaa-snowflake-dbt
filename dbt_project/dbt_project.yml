@@ -35,8 +35,7 @@ models:
 
 # 测试配置
 tests:
-  +store_failures: true
-  +schema: test_results
+  +store_failures: false
 
 # 变量
 vars:
