@@ -28,8 +28,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['No Orders', 'One-time', 'Regular', 'VIP']
+              values: ['No Orders', 'One-time', 'Regular', 'VIP']
       - name: dbt_updated_at
         description: dbt 更新时间戳
         tests:
