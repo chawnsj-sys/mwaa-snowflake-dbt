@@ -41,3 +41,7 @@ tests:
 # 变量
 vars:
   lookback_days: 30
+
+# Hook: dbt run 结束后自动给 ANALYST_ROLE 授权
+on-run-end:
+  - "{{ grant_analyst_access() }}"

@@ -1,0 +1,4 @@
+status_code,status_name,status_cn,is_final
+pending,Pending,待处理,false
+completed,Completed,已完成,true
+cancelled,Cancelled,已取消,true

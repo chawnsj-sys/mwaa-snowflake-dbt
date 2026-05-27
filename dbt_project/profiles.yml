@@ -10,7 +10,7 @@ quicksight_analytics:
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
       password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-      role: ACCOUNTADMIN
+      role: DBT_ROLE
       database: QUICKSIGHT_DB
       warehouse: COMPUTE_WH
       schema: DEV
@@ -23,7 +23,7 @@ quicksight_analytics:
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
       password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-      role: ACCOUNTADMIN
+      role: DBT_ROLE
       database: QUICKSIGHT_DB
       warehouse: COMPUTE_WH
       schema: PUBLIC
