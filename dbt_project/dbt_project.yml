@@ -23,6 +23,10 @@ clean-targets:
 # 模型配置
 models:
   quicksight_analytics:
+    # 自动将 yml 中的 description 同步到 Snowflake COMMENT
+    +persist_docs:
+      relation: true
+      columns: true
     # Staging 层配置
     staging:
       +materialized: view

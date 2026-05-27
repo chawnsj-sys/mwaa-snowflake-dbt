@@ -14,6 +14,36 @@
 | 本地 IDE | Kiro / VSCode + dbt Power User | 模型编辑、编译、运行 |
 | 版本控制 | GitHub | 代码管理，Snowflake Git 集成 |
 
+## dbt 功能
+
+| 功能 | 实现 | 说明 |
+|------|------|------|
+| 模块化 SQL | `{{ ref() }}` / `{{ source() }}` | 模型间依赖自动管理 |
+| Macro | `macros/date_utils.sql` | 日期工具函数复用 |
+| Seed | `seeds/status_mapping.csv` | CSV 数据映射表 |
+| Tests | `unique` / `not_null` / `accepted_values` | 数据质量自动检查 |
+| Hooks | `on-run-end: grant_analyst_access` | 自动给分析师授权 Gold 层 |
+| 环境隔离 | dev/prod target | 本地写 DEV schema，生产写 PUBLIC schema |
+
+## 权限模型（RBAC）
+
+| 角色 | 用途 | 权限 |
+|------|------|------|
+| `DBT_ROLE` | dbt 开发和执行 | ANALYTICS 读写 + DEV/PUBLIC schema 读写 |
+| `ANALYST_ROLE` | 分析师/BI 工具 | 只读 Gold 层（customer_summary, daily_sales） |
+| `ACCOUNTADMIN` | 管理员 | 环境初始化、角色管理 |
+
+```
+DBT_ROLE (dbt run)
+  → 读 ANALYTICS 源表
+  → 写 Silver 层 (staging views)
+  → 写 Gold 层 (marts tables)
+  → on-run-end: GRANT SELECT 给 ANALYST_ROLE
+
+ANALYST_ROLE (分析师/QuickSight)
+  → 只读 Gold 层表
+```
+
 ## 架构图
 
 ```
