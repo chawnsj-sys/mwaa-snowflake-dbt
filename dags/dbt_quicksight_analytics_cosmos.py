@@ -115,7 +115,7 @@ with DAG(
 
     # ========== Silver: 每个 staging 模型独立，跟在对应 ingest 后面 ==========
     stg_customers = DbtTaskGroup(
-        group_id="stg_customers",
+        group_id="run_stg_customers",
         project_config=PROJECT_CONFIG,
         profile_config=PROFILE_CONFIG,
         execution_config=EXECUTION_CONFIG,
@@ -124,7 +124,7 @@ with DAG(
     )
 
     stg_orders = DbtTaskGroup(
-        group_id="stg_orders",
+        group_id="run_stg_orders",
         project_config=PROJECT_CONFIG,
         profile_config=PROFILE_CONFIG,
         execution_config=EXECUTION_CONFIG,
@@ -133,7 +133,7 @@ with DAG(
     )
 
     stg_order_items = DbtTaskGroup(
-        group_id="stg_order_items",
+        group_id="run_stg_order_items",
         project_config=PROJECT_CONFIG,
         profile_config=PROFILE_CONFIG,
         execution_config=EXECUTION_CONFIG,
