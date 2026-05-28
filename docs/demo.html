@@ -50,7 +50,7 @@
         <div class="card" style="padding: 40px 20px;">
             <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
                 <div style="background: #e3f2fd; border: 2px solid #1565c0; border-radius: 12px; padding: 16px 32px; text-align: center; width: 480px; position: relative;">
-                    <div style="position: absolute; left: -90px; top: 50%; transform: translateY(-50%); font-size: 0.75em; color: #1565c0; font-weight: 600;">数据工程师</div>
+                    <div style="position: absolute; left: -90px; top: 50%; transform: translateY(-50%); font-size: 0.75em; color: #1565c0; font-weight: 600;">提示词驱动</div>
                     <div style="font-size: 0.8em; color: #1565c0; font-weight: 600;">① SQL 开发</div>
                     <div style="font-size: 1.1em; font-weight: 700; color: #1a1a2e;">❄️ Snowflake Notebook + Copilot</div>
                     <div style="font-size: 0.8em; color: #666;">自然语言/手写 SQL → 验证逻辑</div>
@@ -64,29 +64,36 @@
                 </div>
                 <div style="font-size: 1.5em; color: #999; padding: 4px 0;">↓ <span style="font-size: 0.6em;">git pull</span></div>
                 <div style="background: #e8f5e9; border: 2px solid #2e7d32; border-radius: 12px; padding: 16px 32px; text-align: center; width: 480px; position: relative;">
-                    <div style="position: absolute; left: -90px; top: 50%; transform: translateY(-50%); font-size: 0.75em; color: #2e7d32; font-weight: 600;">数据工程师</div>
+                    <div style="position: absolute; left: -90px; top: 50%; transform: translateY(-50%); font-size: 0.75em; color: #2e7d32; font-weight: 600;">提示词驱动</div>
                     <div style="font-size: 0.8em; color: #2e7d32; font-weight: 600;">③ 模型开发</div>
-                    <div style="font-size: 1.1em; font-weight: 700; color: #1a1a2e;">🤖 Kiro / VSCode + Cortex</div>
-                    <div style="font-size: 0.8em; color: #666;">AI 翻译 SQL → dbt 模型 + 本地 compile/run 验证（DBT_ROLE）</div>
+                    <div style="font-size: 1.1em; font-weight: 700; color: #1a1a2e;">🤖 Kiro Skill（SQL→dbt 自动翻译）</div>
+                    <div style="font-size: 0.8em; color: #666;">自动转换 ref/source/config + 字段校验 + 规范注入（Steering）</div>
                 </div>
-                <div style="font-size: 1.5em; color: #999; padding: 4px 0;">↓ <span style="font-size: 0.6em;">git push</span></div>
+                <div style="font-size: 1.5em; color: #999; padding: 4px 0;">↓ <span style="font-size: 0.6em;">Kiro Hook 触发</span></div>
+                <div style="background: #fff8e1; border: 2px solid #f9a825; border-radius: 12px; padding: 16px 32px; text-align: center; width: 480px; position: relative;">
+                    <div style="position: absolute; left: -90px; top: 50%; transform: translateY(-50%); font-size: 0.75em; color: #f9a825; font-weight: 600;">质量门禁</div>
+                    <div style="font-size: 0.8em; color: #f9a825; font-weight: 600;">④ 质量门禁</div>
+                    <div style="font-size: 1.1em; font-weight: 700; color: #1a1a2e;">🛡️ Kiro Hook（⚡快速 / 🔍深度）</div>
+                    <div style="font-size: 0.8em; color: #666;">命名规范 · Owner · PII 风险 · 影响范围 · 重复检测</div>
+                </div>
+                <div style="font-size: 1.5em; color: #999; padding: 4px 0;">↓ <span style="font-size: 0.6em;">通过后 git push</span></div>
                 <div style="background: #fff3e0; border: 2px solid #e65100; border-radius: 12px; padding: 16px 32px; text-align: center; width: 480px; position: relative;">
                     <div style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); font-size: 0.75em; color: #e65100; font-weight: 600;">自动</div>
-                    <div style="font-size: 0.8em; color: #e65100; font-weight: 600;">④ 自动部署</div>
+                    <div style="font-size: 0.8em; color: #e65100; font-weight: 600;">⑤ 自动部署</div>
                     <div style="font-size: 1.1em; font-weight: 700; color: #1a1a2e;">⚡ GitHub Actions</div>
                     <div style="font-size: 0.8em; color: #666;">OIDC 认证 → aws s3 sync → MWAA S3</div>
                 </div>
                 <div style="font-size: 1.5em; color: #999; padding: 4px 0;">↓ <span style="font-size: 0.6em;">30 秒自动检测</span></div>
                 <div style="background: #fce4ec; border: 2px solid #c62828; border-radius: 12px; padding: 16px 32px; text-align: center; width: 480px; position: relative;">
                     <div style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); font-size: 0.75em; color: #c62828; font-weight: 600;">自动</div>
-                    <div style="font-size: 0.8em; color: #c62828; font-weight: 600;">⑤ 调度执行</div>
+                    <div style="font-size: 0.8em; color: #c62828; font-weight: 600;">⑥ 调度执行</div>
                     <div style="font-size: 1.1em; font-weight: 700; color: #1a1a2e;">🌊 MWAA + Cosmos（DBT_ROLE）</div>
                     <div style="font-size: 0.8em; color: #666;">自动解析 dbt → Airflow Tasks → 执行到 Snowflake → 自动 GRANT</div>
                 </div>
                 <div style="font-size: 1.5em; color: #999; padding: 4px 0;">↓ <span style="font-size: 0.6em;">数据就绪</span></div>
                 <div style="background: #e0f7fa; border: 2px solid #00838f; border-radius: 12px; padding: 16px 32px; text-align: center; width: 480px; position: relative;">
                     <div style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); font-size: 0.75em; color: #00838f; font-weight: 600;">分析师</div>
-                    <div style="font-size: 0.8em; color: #00838f; font-weight: 600;">⑥ 数据消费</div>
+                    <div style="font-size: 0.8em; color: #00838f; font-weight: 600;">⑦ 数据消费</div>
                     <div style="font-size: 1.1em; font-weight: 700; color: #1a1a2e;">📊 QuickSight / 分析师（ANALYST_ROLE）</div>
                     <div style="font-size: 0.8em; color: #666;">只读 Gold 层 → BI 报表 + 数据分析</div>
                 </div>
@@ -95,12 +102,12 @@
 
         <!-- 2. 技术组件 -->
         <h2>技术组件</h2>
-        <div class="tech-grid">
-            <div class="tech-item"><div class="icon">❄️</div><div class="name">Snowflake</div><div class="desc">数据仓库 + SQL 开发</div></div>
-            <div class="tech-item"><div class="icon">🔄</div><div class="name">dbt Core</div><div class="desc">SQL 模型化转换</div></div>
+        <div class="tech-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="tech-item"><div class="icon">❄️</div><div class="name">Snowflake</div><div class="desc">数据仓库 + Snowpipe</div></div>
+            <div class="tech-item"><div class="icon">🔄</div><div class="name">dbt Core</div><div class="desc">增量转换 + 测试</div></div>
             <div class="tech-item"><div class="icon">🌊</div><div class="name">MWAA + Cosmos</div><div class="desc">调度编排</div></div>
-            <div class="tech-item"><div class="icon">⚡</div><div class="name">GitHub Actions</div><div class="desc">CI/CD 自动部署</div></div>
-            <div class="tech-item"><div class="icon">🤖</div><div class="name">Kiro AI + Cortex</div><div class="desc">AI 辅助开发</div></div>
+            <div class="tech-item"><div class="icon">🤖</div><div class="name">Kiro AI</div><div class="desc">Skill + Hook + Steering</div></div>
+            <div class="tech-item"><div class="icon">⚡</div><div class="name">GitHub Actions</div><div class="desc">CI/CD + Slim CI</div></div>
             <div class="tech-item"><div class="icon">📊</div><div class="name">QuickSight</div><div class="desc">BI 数据消费</div></div>
         </div>
 
@@ -119,91 +126,168 @@
             </div>
         </div>
 
-        <!-- 4. 关键特性 -->
-        <h2>关键特性</h2>
-        <div class="card">
+        <!-- 4. Kiro AI 驱动 -->
+        <h2>🤖 Kiro AI 驱动的 DataOps</h2>
+        <p class="section-intro">通过 Kiro 的 Skill、Hook、Steering 三层能力，将传统 DataOps 升级为 AI 辅助的智能工作流。</p>
+        
+        <div class="card card-highlight">
+            <h3>🧠 Skill — SQL → dbt 智能翻译</h3>
+            <p style="margin: 8px 0; color: #555;">Snowflake Notebook SQL 自动转换为标准 dbt 模型，包含 ref/source/config/去重逻辑。</p>
+            <div class="code-block"># .kiro/skills/sql-to-dbt.md
+Snowflake SQL → Kiro Skill → dbt 模型
+  ✓ 自动 ref()/source() 引用
+  ✓ 字段映射校验（staging 输出 vs marts 引用）
+  ✓ 分层规范（materialized/schema/tags）
+  ✓ 移除 ORDER BY/LIMIT</div>
+        </div>
+
+        <div class="card card-highlight">
+            <h3>⚡ Hook — 发布前质量门禁</h3>
             <table>
-                <tr><th>特性</th><th>实现方式</th><th>效果</th></tr>
-                <tr><td>AI 辅助开发</td><td>Kiro (Claude) + Snowflake Copilot + Cortex CLI</td><td>自然语言生成 SQL 和 dbt 模型</td></tr>
-                <tr><td>自动部署</td><td>GitHub Actions + OIDC</td><td>git push 即部署，无需手动操作</td></tr>
-                <tr><td>环境隔离</td><td>dev/prod 不同 schema + RBAC</td><td>本地开发不影响生产</td></tr>
-                <tr><td>分层架构</td><td>Silver (view) → Gold (table)</td><td>清晰的数据血缘</td></tr>
-                <tr><td>自动授权</td><td>on-run-end Hook → GRANT ANALYST_ROLE</td><td>dbt run 后分析师立即可用</td></tr>
-                <tr><td>数据测试</td><td>unique / not_null / accepted_values</td><td>每次运行自动验证数据质量</td></tr>
-                <tr><td>Cosmos 缓存</td><td>/tmp/cosmos_cache</td><td>DAG 解析加速 5-10 倍</td></tr>
+                <tr><th>Hook</th><th>触发方式</th><th>功能</th></tr>
+                <tr><td>⚡ 快速检查</td><td>手动触发</td><td>命名规范、Owner 分配、文档完整性、PII 风险 AI 判断、影响范围</td></tr>
+                <tr><td>🔍 深度检查</td><td>手动触发</td><td>连接 Snowflake：PII 字段扫描、重复模型检测、字段相似度、冷表清理</td></tr>
             </table>
         </div>
 
-        <!-- 5. 开发流程 (DAG) -->
-        <h2>DAG 分层架构</h2>
+        <div class="card card-highlight">
+            <h3>📐 Steering — 团队规范自动注入</h3>
+            <table>
+                <tr><th>文件</th><th>作用</th></tr>
+                <tr><td><code>development-workflow.md</code></td><td>开发流程（Notebook → dbt → MWAA 全链路）</td></tr>
+                <tr><td><code>snowflake.md</code></td><td>Snowflake 连接配置、环境隔离规则</td></tr>
+                <tr><td><code>mwaa-cicd-best-practices.md</code></td><td>CI/CD 部署规范、缓存管理</td></tr>
+            </table>
+        </div>
+
+        <!-- 数据管道：Snowpipe + DAG -->
+        <h2>数据管道</h2>
+        <p class="section-intro">S3 Parquet → Snowpipe → RAW_LANDING → dbt 增量转换（Silver → Gold）</p>
+        
         <div class="dag-visual">
-            <p style="font-size:0.9em; opacity:0.9;">start → silver_models → gold_models → end</p>
+            <p style="font-size:0.9em; opacity:0.9;">S3 → Snowpipe → ODS → Silver → Gold</p>
             <div class="dag-flow">
-                <div class="dag-node">start</div>
+                <div class="dag-group">
+                    <div class="dag-group-label">数据源</div>
+                    <div class="dag-node">S3 Parquet</div>
+                </div>
                 <div class="dag-arrow">→</div>
                 <div class="dag-group">
-                    <div class="dag-group-label">Silver 层 (数据清洗)</div>
+                    <div class="dag-group-label">ODS 层 (RAW_LANDING)</div>
+                    <div class="dag-node">customers</div>
+                    <div class="dag-node">orders</div>
+                    <div class="dag-node">order_items</div>
+                </div>
+                <div class="dag-arrow">→</div>
+                <div class="dag-group">
+                    <div class="dag-group-label">Silver 层 (incremental)</div>
                     <div class="dag-node">stg_customers</div>
                     <div class="dag-node">stg_orders</div>
                     <div class="dag-node">stg_order_items</div>
                 </div>
                 <div class="dag-arrow">→</div>
                 <div class="dag-group">
-                    <div class="dag-group-label">Gold 层 (业务聚合)</div>
+                    <div class="dag-group-label">Gold 层 (incremental)</div>
                     <div class="dag-node">customer_summary</div>
                     <div class="dag-node">daily_sales</div>
                 </div>
-                <div class="dag-arrow">→</div>
-                <div class="dag-node">end</div>
             </div>
-            <p style="margin-top:16px; font-size:0.85em; opacity:0.8;">总耗时约 3 分钟 | 每日 08:00 UTC 自动执行 | Cosmos 自动解析依赖</p>
+            <p style="margin-top:16px; font-size:0.85em; opacity:0.8;">每日 08:00 UTC | Snowpipe 加载 ODS | dbt 增量转换 Silver→Gold | Cosmos 自动编排</p>
+        </div>
+
+        <div class="card">
+            <table>
+                <tr><th>配置项</th><th>值</th></tr>
+                <tr><td>S3 桶</td><td><code>s3://snowflake-ingestion-782683897770/</code></td></tr>
+                <tr><td>数据格式</td><td>Parquet (Snappy)</td></tr>
+                <tr><td>分区方式</td><td><code>&lt;table&gt;/dt=YYYY-MM-DD/</code></td></tr>
+                <tr><td>落地 Schema</td><td><code>QUICKSIGHT_DB.RAW_LANDING</code></td></tr>
+                <tr><td>dbt 策略</td><td>维度表 merge (upsert) / 事实表 append (追加)</td></tr>
+            </table>
+        </div>
+
+        <div class="card card-highlight">
+            <h3>🛡️ 数据质量：Snowflake DMF</h3>
+            <p style="margin: 8px 0; color: #555;">ODS 层自动数据质量监控，Snowpipe 加载后触发检测。</p>
+            <table>
+                <tr><th>表</th><th>类型</th><th>dbt 策略</th><th>DMF 监控</th></tr>
+                <tr><td>CUSTOMERS</td><td>维度表</td><td>merge (upsert)</td><td>NULL_COUNT(customer_id, email) + DUPLICATE_COUNT(customer_id)</td></tr>
+                <tr><td>ORDERS</td><td>事实表</td><td>append (追加)</td><td>NULL_COUNT(order_id, customer_id, total_amount, status)</td></tr>
+                <tr><td>ORDER_ITEMS</td><td>事实表</td><td>append (追加)</td><td>NULL_COUNT(order_item_id, order_id, quantity, unit_price)</td></tr>
+            </table>
+            <div style="margin-top: 8px; font-size: 0.85em; color: #666;">
+                维度表检查唯一性（DUPLICATE_COUNT），事实表只检查完整性（NULL_COUNT）<br>
+                触发方式：TRIGGER_ON_CHANGES | 配置脚本：<code>scripts/init_dmf.sql</code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🔄 dbt 转换能力</h3>
+            <table>
+                <tr><th>能力</th><th>实现</th><th>说明</th></tr>
+                <tr><td>增量物化</td><td><code>incremental</code> + merge/append</td><td>维度表 upsert，事实表按天追加</td></tr>
+                <tr><td>模块化</td><td><code>ref()</code> / <code>source()</code></td><td>模型间依赖自动管理</td></tr>
+                <tr><td>Slim CI</td><td><code>state:modified+</code></td><td>PR 时只跑修改的模型，节省 ~30% 成本</td></tr>
+                <tr><td>成本归因</td><td><code>query_tag</code></td><td>按层追踪 Snowflake credit 消耗</td></tr>
+                <tr><td>数据测试</td><td><code>unique / not_null</code></td><td>每次运行自动验证</td></tr>
+                <tr><td>自动授权</td><td><code>on-run-end</code> Hook</td><td>GRANT ANALYST_ROLE 读 Gold 层</td></tr>
+                <tr><td>Owner 追踪</td><td><code>set_owner_tag</code></td><td>模型责任人标签</td></tr>
+            </table>
         </div>
 
         <!-- 6. 项目结构 -->
         <h2>项目结构</h2>
         <div class="card">
             <div class="code-block">mwaa-snowflake-dbt/
-├── .github/workflows/deploy-to-mwaa.yml   # CI/CD 自动部署
-├── dags/dbt_quicksight_analytics_cosmos.py # Airflow DAG (Silver → Gold)
+├── .kiro/                        # 🤖 Kiro AI 配置
+│   ├── skills/sql-to-dbt.md      # SQL → dbt 翻译技能
+│   ├── hooks/fast-check.kiro.hook  # ⚡ 快速校验
+│   ├── hooks/deep-check.kiro.hook  # 🔍 深度校验
+│   └── steering/                 # 团队规范（自动注入）
+├── .github/workflows/
+│   ├── deploy-to-mwaa.yml        # CD: push → S3 → MWAA
+│   └── dbt-slim-ci.yml           # CI: PR → state:modified+ build
+├── dags/dbt_quicksight_analytics_cosmos.py  # DAG (Silver → Gold)
 ├── dbt_project/
-│   ├── models/staging/   # Silver 层 (view) - 数据清洗
-│   ├── models/marts/     # Gold 层 (table) - 业务聚合
-│   ├── macros/           # 复用逻辑 (date_utils, grant_access)
-│   ├── seeds/            # CSV 数据映射 (status_mapping)
-│   ├── profiles.yml      # dev/prod 连接配置
-│   └── dbt_project.yml   # 项目配置 + on-run-end Hook
-├── notebooks/            # Snowflake 验证 SQL
-├── scripts/              # 初始化脚本 (Snowflake + GitHub Actions)
-├── docs/                 # 文档 + demo.html
-└── README.md</div>
+│   ├── models/staging/           # Silver 层 (incremental merge)
+│   ├── models/marts/             # Gold 层 (incremental merge)
+│   ├── macros/                   # 复用逻辑 + owner tag
+│   ├── dbt_project.yml           # query_tag + persist_docs
+│   └── profiles.yml              # dev/prod 连接
+├── scripts/
+│   ├── init_snowpipe.sql         # Snowpipe 配置（Stage/Pipe/表）
+│   ├── validate_models.py        # 模型校验（Hook 调用）
+│   └── generate_inspection_report.py  # 巡检报告生成
+├── _archived/                    # 暂停调度的模型（备份）
+└── docs/demo.html                # 本文件</div>
         </div>
 
-        <!-- 7. dbt 核心能力 -->
-        <h2>dbt 核心能力</h2>
-        <div class="card">
-            <p class="section-intro">dbt 将软件工程最佳实践引入数据转换，提升数据可靠性、可溯源性和可审查性。</p>
-            <table>
-                <tr><th>能力</th><th>实现方式</th><th>价值</th></tr>
-                <tr><td>模块化 SQL</td><td><code>{{ ref('stg_xxx') }}</code> / <code>{{ source() }}</code></td><td>消除重复代码，自动管理依赖</td></tr>
-                <tr><td>Macro 复用</td><td><code>macros/date_utils.sql</code></td><td>通用逻辑只写一次，多模型复用</td></tr>
-                <tr><td>Seed 数据映射</td><td><code>seeds/status_mapping.csv</code></td><td>用 CSV 管理映射表，比硬编码好维护</td></tr>
-                <tr><td>数据测试</td><td><code>unique</code> / <code>not_null</code> / <code>accepted_values</code></td><td>每次运行自动验证数据质量</td></tr>
-                <tr><td>Hooks</td><td><code>on-run-end: grant_analyst_access</code></td><td>dbt run 后自动给分析师授权 Gold 层</td></tr>
-                <tr><td>数据血缘</td><td>Snowflake Lineage + Airflow DAG + dbt docs</td><td>三层血缘追踪（物理 + 任务 + 逻辑）</td></tr>
-                <tr><td>环境隔离</td><td>profiles.yml dev/prod target</td><td>同一套代码，不同 schema 输出</td></tr>
-            </table>
-        </div>
-
-        <!-- 8. 权限模型 -->
+        <!-- 7. 权限模型 -->
         <h2>权限模型（RBAC）</h2>
         <div class="card card-highlight">
+            <h3>Snowflake 用户</h3>
+            <table>
+                <tr><th>用户</th><th>角色</th><th>用途</th><th>状态</th></tr>
+                <tr><td><code>mya</code></td><td>ACCOUNTADMIN</td><td>管理员，环境初始化</td><td>✅ 活跃</td></tr>
+                <tr><td><code>alice</code></td><td>DBT_ROLE</td><td>数据工程师，负责客户域模型</td><td>✅ 活跃</td></tr>
+                <tr><td><code>bob</code></td><td>DBT_ROLE</td><td>数据工程师，负责销售域模型</td><td>✅ 活跃</td></tr>
+            </table>
+
+            <h3 style="margin-top: 20px;">角色体系</h3>
             <table>
                 <tr><th>角色</th><th>用途</th><th>权限范围</th></tr>
-                <tr><td><code>DBT_ROLE</code></td><td>dbt 开发和执行</td><td>ANALYTICS 读写 + DEV/PUBLIC schema 读写</td></tr>
+                <tr><td><code>DBT_ROLE</code></td><td>dbt 开发和执行</td><td>ANALYTICS + RAW_LANDING 读写 + DEV/PUBLIC schema 读写</td></tr>
                 <tr><td><code>ANALYST_ROLE</code></td><td>分析师 / QuickSight</td><td>只读 Gold 层（customer_summary, daily_sales）</td></tr>
-                <tr><td><code>ACCOUNTADMIN</code></td><td>管理员</td><td>环境初始化、角色管理</td></tr>
+                <tr><td><code>ACCOUNTADMIN</code></td><td>管理员</td><td>环境初始化、角色管理、Storage Integration</td></tr>
             </table>
-            <div style="margin-top: 16px; padding: 12px; background: #f8f9fa; border-radius: 8px; font-size: 0.85em;">
+
+            <h3 style="margin-top: 20px;">模型 Owner 分配</h3>
+            <table>
+                <tr><th>Owner</th><th>负责模型</th><th>状态</th></tr>
+                <tr><td><strong>alice</strong></td><td><code>customer_summary</code></td><td>✅ 已配置</td></tr>
+                <tr><td><strong>bob</strong></td><td><code>daily_sales</code></td><td>✅ 已配置</td></tr>
+            </table>
+            <div style="margin-top: 12px; padding: 12px; background: #f8f9fa; border-radius: 8px; font-size: 0.85em;">
                 <strong>自动授权流程：</strong> dbt run 完成 → on-run-end Hook → GRANT SELECT 给 ANALYST_ROLE → 分析师立即可查询最新 Gold 层数据
             </div>
         </div>
@@ -257,7 +341,7 @@
         </div>
 
         <footer>
-            基于 Snowflake 的 DataOps Demo | MWAA + dbt + Snowflake | 2026
+            基于 Snowflake 的 DataOps Demo | MWAA + dbt + Snowflake + Kiro AI | 2026
         </footer>
     </div>
 </body>

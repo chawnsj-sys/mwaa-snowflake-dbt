@@ -1,5 +1,5 @@
 -- Marts 层：每日销售汇总表（增量更新）
--- 按日期统计订单和销售数据，按 order_date merge
+-- 事实表：按 order_date merge，每天聚合一行
 
 {{ config(
     materialized='incremental',
@@ -14,7 +14,7 @@
 with orders as (
     select * from {{ ref('stg_orders') }}
     {% if is_incremental() %}
-        where _loaded_at > (select coalesce(max(dbt_updated_at), '1900-01-01') from {{ this }})
+        where _partition_date = dateadd(day, -1, current_date())
     {% endif %}
 ),
 
@@ -44,6 +44,8 @@ daily_stats as (
             2
         ) as completion_rate,
 
+        -- 分区和审计字段
+        max(_partition_date) as _partition_date,
         current_timestamp() as dbt_updated_at
 
     from orders

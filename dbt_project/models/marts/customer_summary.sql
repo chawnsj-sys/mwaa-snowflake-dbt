@@ -1,5 +1,5 @@
 -- Marts 层：客户汇总分析表（增量更新）
--- 整合客户信息和订单统计，按 customer_id merge
+-- 维度表：按 customer_id merge，整合客户信息和订单统计
 
 {{ config(
     materialized='incremental',
@@ -14,7 +14,7 @@
 with customers as (
     select * from {{ ref('stg_customers') }}
     {% if is_incremental() %}
-        where _loaded_at > (select coalesce(max(dbt_updated_at), '1900-01-01') from {{ this }})
+        where _partition_date = dateadd(day, -1, current_date())
     {% endif %}
 ),
 
@@ -52,6 +52,8 @@ customer_orders as (
             when count(o.order_id) > 5 then 'VIP'
         end as customer_segment,
 
+        -- 分区和审计字段
+        c._partition_date,
         current_timestamp() as dbt_updated_at
 
     from customers c
@@ -61,7 +63,8 @@ customer_orders as (
         c.customer_name,
         c.email,
         c.city,
-        c.registration_date
+        c.registration_date,
+        c._partition_date
 )
 
 select * from customer_orders
