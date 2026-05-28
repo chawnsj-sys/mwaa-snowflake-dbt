@@ -4,7 +4,8 @@
 {{ config(
     materialized='table',
     schema='analytics',
-    tags=['marts']
+    tags=['marts'],
+    post_hook="{{ set_owner_tag('alice') }}"
 ) }}
 
 with customers as (

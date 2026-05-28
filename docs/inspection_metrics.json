@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-05-28T10:30:19.812172",
+  "scores": {
+    "overall": 71,
+    "security": 85,
+    "operations": 73,
+    "cost": 95,
+    "quality": 82
+  },
+  "naming_compliance": {
+    "ods_prefix": "0/6",
+    "violations": [
+      "CUSTOMERS",
+      "CUSTOMER_FEEDBACK",
+      "ORDERS",
+      "ORDER_ITEMS",
+      "PRODUCTS",
+      "PROMOTIONS"
+    ]
+  },
+  "comment_coverage": {
+    "tables_rate": 23.2,
+    "columns_rate": 10.0
+  },
+  "cold_tables": [
+    "CUSTOMER_RFM_ANALYSIS",
+    "MONTHLY_SALES_TREND",
+    "NOTEBOOK_DAILY_SALES",
+    "PRODUCT_SALES_ANALYSIS",
+    "ACCEPTED_VALUES_CUSTOMER_SUMMA_2C36B1BD57983D0C92608CD8F5E311B1",
+    "ACCEPTED_VALUES_STG_ORDERS_197A43EDED1E3E855EDD8F11E601BF51",
+    "NOT_NULL_CUSTOMER_SUMMARY_CUSTOMER_ID",
+    "NOT_NULL_CUSTOMER_SUMMARY_CUSTOMER_SEGMENT",
+    "NOT_NULL_CUSTOMER_SUMMARY_DBT_UPDATED_AT",
+    "NOT_NULL_CUSTOMER_SUMMARY_TOTAL_ORDERS",
+    "NOT_NULL_CUSTOMER_SUMMARY_TOTAL_SPENT",
+    "NOT_NULL_DAILY_SALES_DBT_UPDATED_AT",
+    "NOT_NULL_DAILY_SALES_ORDER_DATE",
+    "NOT_NULL_DAILY_SALES_TOTAL_ORDERS",
+    "NOT_NULL_DAILY_SALES_TOTAL_REVENUE",
+    "NOT_NULL_DAILY_SALES_UNIQUE_CUSTOMERS",
+    "NOT_NULL_STG_CUSTOMERS_CUSTOMER_ID",
+    "NOT_NULL_STG_CUSTOMERS_CUSTOMER_NAME",
+    "NOT_NULL_STG_CUSTOMERS_DBT_LOADED_AT",
+    "NOT_NULL_STG_CUSTOMERS_EMAIL",
+    "NOT_NULL_STG_ORDERS_CUSTOMER_ID",
+    "NOT_NULL_STG_ORDERS_ORDER_ID",
+    "NOT_NULL_STG_ORDERS_STATUS",
+    "NOT_NULL_STG_ORDERS_TOTAL_AMOUNT",
+    "NOT_NULL_STG_ORDER_ITEMS_ORDER_ID",
+    "NOT_NULL_STG_ORDER_ITEMS_ORDER_ITEM_ID",
+    "UNIQUE_CUSTOMER_SUMMARY_CUSTOMER_ID",
+    "UNIQUE_DAILY_SALES_ORDER_DATE",
+    "UNIQUE_STG_CUSTOMERS_CUSTOMER_ID",
+    "UNIQUE_STG_ORDERS_ORDER_ID",
+    "UNIQUE_STG_ORDER_ITEMS_ORDER_ITEM_ID"
+  ],
+  "zombie_users": [
+    "GLUE_FEDERATION_USER"
+  ],
+  "total_credits": 17.682568353,
+  "warehouse_credits": {
+    "MARKETING_ETL_WH": 8.535241667,
+    "COMPUTE_WH": 7.377816959,
+    "MARKETING_BI_WH": 1.530383893,
+    "MARKETING_BI_WH_M": 0.239063334,
+    "CLOUD_SERVICES_ONLY": 6.25e-05
+  },
+  "roi": {
+    "queries_per_credit": 0.6,
+    "rows_per_credit": 8.0,
+    "total_queries": 10,
+    "total_rows": 141
+  },
+  "cost_by_user": [
+    {
+      "user": "SYSTEM",
+      "queries": 27078,
+      "credits": 0.04290599999999999
+    },
+    {
+      "user": "MYA",
+      "queries": 7498,
+      "credits": 0.041084
+    },
+    {
+      "user": "DBT_USER",
+      "queries": 428,
+      "credits": 0.004342
+    },
+    {
+      "user": "FIRST_USER",
+      "queries": 4,
+      "credits": 6.3e-05
+    },
+    {
+      "user": "ANALYST_USER",
+      "queries": 3,
+      "credits": 1.9999999999999998e-05
+    }
+  ],
+  "total_tables": 56,
+  "total_columns": 439,
+  "total_users": 4,
+  "total_roles": 67
+}
