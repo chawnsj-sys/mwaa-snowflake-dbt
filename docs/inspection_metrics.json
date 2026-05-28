@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-28T10:30:19.812172",
+  "generated_at": "2026-05-28T11:13:39.460845",
   "scores": {
-    "overall": 71,
-    "security": 85,
-    "operations": 73,
+    "overall": 69,
+    "security": 75,
+    "operations": 75,
     "cost": 95,
     "quality": 82
   },
@@ -19,8 +19,8 @@
     ]
   },
   "comment_coverage": {
-    "tables_rate": 23.2,
-    "columns_rate": 10.0
+    "tables_rate": 25.0,
+    "columns_rate": 11.4
   },
   "cold_tables": [
     "CUSTOMER_RFM_ANALYSIS",
@@ -56,37 +56,39 @@
     "UNIQUE_STG_ORDER_ITEMS_ORDER_ITEM_ID"
   ],
   "zombie_users": [
+    "USER_ALICE",
+    "USER_BOB",
     "GLUE_FEDERATION_USER"
   ],
-  "total_credits": 17.682568353,
+  "total_credits": 18.440191135,
   "warehouse_credits": {
-    "MARKETING_ETL_WH": 8.535241667,
-    "COMPUTE_WH": 7.377816959,
+    "MARKETING_ETL_WH": 8.535333889,
+    "COMPUTE_WH": 8.135347519,
     "MARKETING_BI_WH": 1.530383893,
     "MARKETING_BI_WH_M": 0.239063334,
     "CLOUD_SERVICES_ONLY": 6.25e-05
   },
   "roi": {
-    "queries_per_credit": 0.6,
-    "rows_per_credit": 8.0,
+    "queries_per_credit": 0.5,
+    "rows_per_credit": 10.0,
     "total_queries": 10,
-    "total_rows": 141
+    "total_rows": 186
   },
   "cost_by_user": [
     {
+      "user": "MYA",
+      "queries": 7598,
+      "credits": 0.053256
+    },
+    {
       "user": "SYSTEM",
-      "queries": 27078,
+      "queries": 27081,
       "credits": 0.04290599999999999
     },
     {
-      "user": "MYA",
-      "queries": 7498,
-      "credits": 0.041084
-    },
-    {
       "user": "DBT_USER",
-      "queries": 428,
-      "credits": 0.004342
+      "queries": 441,
+      "credits": 0.004573000000000001
     },
     {
       "user": "FIRST_USER",
@@ -101,6 +103,8 @@
   ],
   "total_tables": 56,
   "total_columns": 439,
-  "total_users": 4,
-  "total_roles": 67
+  "total_users": 6,
+  "total_roles": 67,
+  "table_owners": {},
+  "owner_coverage_rate": 0.0
 }

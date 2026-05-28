@@ -349,9 +349,8 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>❄️ Snowflake 数据仓库运营健康度报告</h1>
-            <div class="subtitle">QUICKSIGHT_DB | 按角色视图 | 2026-05-27</div>
-            <div class="db-badge">📦 多维度巡检 · 角色定制视图 · 自动化生成</div>
+            <h1>❄️ Snowflake 运营巡检报告</h1>
+            <div class="subtitle">账户: RUKQCBI-WS06286 | 2026-05-28 11:13:39 CST</div>
         </div>
 
         <!-- Tab Navigation -->
@@ -364,6 +363,12 @@
 
 
         <!-- ==================== TAB 1: 数据工程师 ==================== -->
+        
+        
+        
+        
+        
+        
         
         
         
@@ -386,9 +391,8 @@
                 <div class="section-header eng-header">📌 本期关注</div>
                 <div class="section-body">
                     <ul style="list-style:none;padding:0;margin:0;">
-                        <li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 4 张业务表无数据，可能需要检查 DAG 调度</li>
-<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">💡 建议启用 Snowflake DMFs（Data Metric Functions）实现持续自动化质量监控</li>
-<li style="padding:8px 0;font-size:0.95em;">📝 近 7 天有 20 项 Schema 变更，请确认是否符合预期</li>
+                        <li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 4 张业务表无数据：CUSTOMER_RFM_ANALYSIS, MONTHLY_SALES_TREND, NOTEBOOK_DAILY_SALES，请检查 DAG 调度</li>
+<li style="padding:8px 0;font-size:0.95em;">📝 近 7 天有 20 项 Schema 变更</li>
                     </ul>
                 </div>
             </div>
@@ -415,7 +419,7 @@
                         <h3>简化 DORA 指标</h3>
                         <div class="metric-grid">
                             <div class="metric-card blue">
-                                <div class="value">123</div>
+                                <div class="value">136</div>
                                 <div class="label">部署频率 (7天 dbt run)</div>
                             </div>
                             <div class="metric-card green">
@@ -479,7 +483,7 @@
                                 <tr><th>#</th><th>耗时</th><th>用户</th><th>Warehouse</th><th>产出行</th><th>SQL 预览</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>1</td><td><strong>1.7s</strong></td><td>MYA</td><td>COMPUTE_WH</td><td>20</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT table_schema, table_name, table_type,
+                                <tr><td>1</td><td><strong>1.9s</strong></td><td>MYA</td><td>COMPUTE_WH</td><td>20</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT table_schema, table_name, table_type,
                    'MODIFIED' as change_type, last_altered::date as change_date
             FROM SNOWFLAKE.ACCOUNT_USAGE.TABLES
             WHERE last_alte</code></td></tr>
@@ -487,26 +491,42 @@
                    'MODIFIED' as change_type, last_altered::date as change_date
             FROM SNOWFLAKE.ACCOUNT_USAGE.TABLES
             WHERE last_alte</code></td></tr>
-<tr><td>3</td><td><strong>1.6s</strong></td><td>MYA</td><td>COMPUTE_WH</td><td>52</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT column_name FROM SNOWFLAKE.INFORMATION_SCHEMA.COLUMNS WHERE table_schema='ACCOUNT_USAGE' AND table_name='COLUMNS' ORDER BY ordinal_position</code></td></tr>
-<tr><td>4</td><td><strong>1.4s</strong></td><td>MYA</td><td>COMPUTE_WH</td><td>4</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT name, default_role, disabled, last_success_login
-        FROM SNOWFLAKE.ACCOUNT_USAGE.USERS WHERE deleted_on IS NULL</code></td></tr>
-<tr><td>5</td><td><strong>1.2s</strong></td><td>MYA</td><td>COMPUTE_WH</td><td>20</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT query_type, warehouse_name, user_name, 
-                   execution_time/1000.0 as exec_seconds,
-                   rows_produced, query_tag
-            FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HIST</code></td></tr>
+<tr><td>3</td><td><strong>1.7s</strong></td><td>MYA</td><td>COMPUTE_WH</td><td>20</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT table_schema, table_name, table_type,
+                   'MODIFIED' as change_type, last_altered::date as change_date
+            FROM SNOWFLAKE.ACCOUNT_USAGE.TABLES
+            WHERE last_alte</code></td></tr>
+<tr><td>4</td><td><strong>1.7s</strong></td><td>MYA</td><td>COMPUTE_WH</td><td>20</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT table_schema, table_name, table_type,
+                   'MODIFIED' as change_type, last_altered::date as change_date
+            FROM SNOWFLAKE.ACCOUNT_USAGE.TABLES
+            WHERE last_alte</code></td></tr>
+<tr><td>5</td><td><strong>1.6s</strong></td><td>MYA</td><td>COMPUTE_WH</td><td>52</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT column_name FROM SNOWFLAKE.INFORMATION_SCHEMA.COLUMNS WHERE table_schema='ACCOUNT_USAGE' AND table_name='COLUMNS' ORDER BY ordinal_position</code></td></tr>
 
                             </tbody>
                         </table>
                     </div>
                     <div class="subsection">
                         <h3>资源溢出 & 排队指标</h3>
-                        <table><thead><tr><th>Warehouse</th><th>平均排队时间</th><th>溢出数据量</th></tr></thead><tbody><tr><td><strong>MARKETING_ETL_WH</strong></td><td>0.00s</td><td>0.0 MB</td></tr>
-<tr><td><strong>COMPUTE_WH</strong></td><td>0.00s</td><td>0.0 MB</td></tr>
+                        <table><thead><tr><th>Warehouse</th><th>平均排队时间</th><th>溢出数据量</th></tr></thead><tbody><tr><td><strong>COMPUTE_WH</strong></td><td>0.00s</td><td>0.0 MB</td></tr>
+<tr><td><strong>MARKETING_ETL_WH</strong></td><td>0.00s</td><td>0.0 MB</td></tr>
 </tbody></table>
                     </div>
                     
                     
                     <div class="finding-box success">✅ 无资源溢出或排队等待，Warehouse 规格匹配当前负载。</div>
+                </div>
+            </div>
+
+            <!-- 重复查询检测 -->
+            <div class="section">
+                <div class="section-header eng-header">🔄 重复查询检测（近 7 天执行 ≥10 次）</div>
+                <div class="section-body">
+                    <table><thead><tr><th>执行次数</th><th>用户</th><th>平均耗时</th><th>SQL 样本</th></tr></thead><tbody><tr><td>142</td><td>MYA</td><td>0.0s</td><td><code style="font-size:0.75em;word-break:break-all;">CALL SYSTEM$GET_RECENT_IN_APP_NOTIFICATIONS()</code></td></tr>
+<tr><td>119</td><td>MYA</td><td>0.0s</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT SYS_CONTEXT('SNOWFLAKE$SESSION', 'USABLE_ROLES_FAST') as NAME</code></td></tr>
+<tr><td>118</td><td>MYA</td><td>0.0s</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT (is_database_role_in_session('COPILOT_USER') AND (is_database_role_in_session('CORTEX_USER') OR is_database_role_in_session('CORTEX_AGENT_USER'</code></td></tr>
+<tr><td>118</td><td>MYA</td><td>0.0s</td><td><code style="font-size:0.75em;word-break:break-all;">SELECT current_role()</code></td></tr>
+<tr><td>56</td><td>MYA</td><td>0.0s</td><td><code style="font-size:0.75em;word-break:break-all;">select ENTITY_DETAIL(?, ?, ?)</code></td></tr>
+</tbody></table>
+                    <div class="finding-box">💡 <strong>优化建议</strong>：高频重复查询建议使用 Result Cache 或创建物化视图减少重复计算。</div>
                 </div>
             </div>
 
@@ -521,6 +541,7 @@
                         </div>
                     </div>
                     <table><thead><tr><th>变更类型</th><th>表</th><th>类型</th><th>日期</th></tr></thead><tbody><tr><td><span class="badge badge-info">变更</span></td><td>DEV_ANALYTICS.CUSTOMER_SUMMARY</td><td>BASE TABLE</td><td>2026-05-27</td></tr>
+<tr><td><span class="badge badge-info">变更</span></td><td>DEV_ANALYTICS.DAILY_SALES</td><td>BASE TABLE</td><td>2026-05-27</td></tr>
 <tr><td><span class="badge badge-info">变更</span></td><td>DEV_ANALYTICS.STG_CUSTOMERS</td><td>VIEW</td><td>2026-05-27</td></tr>
 <tr><td><span class="badge badge-info">变更</span></td><td>PUBLIC_ANALYTICS.DAILY_SALES</td><td>BASE TABLE</td><td>2026-05-27</td></tr>
 <tr><td><span class="badge badge-info">变更</span></td><td>PUBLIC_ANALYTICS.CUSTOMER_SUMMARY</td><td>BASE TABLE</td><td>2026-05-27</td></tr>
@@ -529,7 +550,6 @@
 <tr><td><span class="badge badge-info">变更</span></td><td>PUBLIC_ANALYTICS.STG_CUSTOMERS</td><td>VIEW</td><td>2026-05-27</td></tr>
 <tr><td><span class="badge badge-info">变更</span></td><td>ANALYTICS.PROMOTIONS</td><td>BASE TABLE</td><td>2026-05-27</td></tr>
 <tr><td><span class="badge badge-info">变更</span></td><td>ANALYTICS.CUSTOMER_FEEDBACK</td><td>BASE TABLE</td><td>2026-05-27</td></tr>
-<tr><td><span class="badge badge-info">变更</span></td><td>ANALYTICS.PRODUCTS</td><td>BASE TABLE</td><td>2026-05-27</td></tr>
 </tbody></table>
                 </div>
             </div>
@@ -537,6 +557,12 @@
 
 
         <!-- ==================== TAB 2: 数据分析师 ==================== -->
+        
+        
+        
+        
+        
+        
         
         
         
@@ -559,9 +585,9 @@
                 <div class="section-header analyst-header">📌 本期关注</div>
                 <div class="section-body">
                     <ul style="list-style:none;padding:0;margin:0;">
-                        <li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 字段注释覆盖率仅 10.0%，查找字段含义可能困难</li>
-<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 14 张 Gold 层表为空，暂不可用于分析</li>
-<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">💡 表注释覆盖率 23.2%，建议参考数据字典了解各表用途</li>
+                        <li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 字段注释覆盖率仅 11.4%，查找字段含义可能困难</li>
+<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 14 张 Gold 层表为空：STG_CUSTOMERS, STG_ORDERS, STG_ORDER_ITEMS</li>
+<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">💡 表注释覆盖率 25.0%，建议参考数据字典了解各表用途</li>
 <li style="padding:8px 0;font-size:0.95em;">📖 本报告包含完整数据字典，可直接查阅 Gold 层表结构和字段说明</li>
                     </ul>
                 </div>
@@ -614,8 +640,8 @@
         </div>
 <div class="bar-item">
             <span class="bar-label">DEV_ANALYTICS</span>
-            <div class="bar-track"><div class="bar-fill medium" style="width: 40%;">40%</div></div>
-            <span class="bar-value">2/5</span>
+            <div class="bar-track"><div class="bar-fill medium" style="width: 60%;">60%</div></div>
+            <span class="bar-value">3/5</span>
         </div>
 <div class="bar-item">
             <span class="bar-label">PUBLIC_ANALYTICS</span>
@@ -642,11 +668,11 @@
                     </div>
                     <div class="metric-grid">
                         <div class="metric-card yellow">
-                            <div class="value">23.2%</div>
+                            <div class="value">25.0%</div>
                             <div class="label">表注释覆盖率</div>
                         </div>
                         <div class="metric-card red">
-                            <div class="value">10.0%</div>
+                            <div class="value">11.4%</div>
                             <div class="label">字段注释覆盖率</div>
                         </div>
                     </div>
@@ -658,7 +684,7 @@
                 <div class="section-header analyst-header">📖 数据字典（Gold 层）</div>
                 <div class="section-body">
                     <div class="subsection">
-            <h3>📋 DEV_ANALYTICS.CUSTOMER_SUMMARY <span class="badge badge-gray">BASE TABLE</span></h3>
+            <h3>📋 DEV_ANALYTICS.CUSTOMER_SUMMARY <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-success">🟢 良好</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;">客户汇总分析表，整合客户信息和订单统计</p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -681,27 +707,27 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 DEV_ANALYTICS.DAILY_SALES <span class="badge badge-gray">BASE TABLE</span></h3>
-            <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
+            <h3>📋 DEV_ANALYTICS.DAILY_SALES <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-success">🟢 良好</span></h3>
+            <p style="margin-bottom:8px;color:#555;font-size:0.9em;">每日销售汇总表，按日期统计订单和销售数据</p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
-                <tbody><tr><td>ORDER_DATE</td><td><code>DATE</code></td><td></td></tr>
-<tr><td>TOTAL_ORDERS</td><td><code>NUMBER</code></td><td></td></tr>
-<tr><td>UNIQUE_CUSTOMERS</td><td><code>NUMBER</code></td><td></td></tr>
+                <tbody><tr><td>ORDER_DATE</td><td><code>DATE</code></td><td>订单日期</td></tr>
+<tr><td>TOTAL_ORDERS</td><td><code>NUMBER</code></td><td>当日总订单数</td></tr>
+<tr><td>UNIQUE_CUSTOMERS</td><td><code>NUMBER</code></td><td>当日独立客户数</td></tr>
 <tr><td>COMPLETED_ORDERS</td><td><code>NUMBER</code></td><td></td></tr>
 <tr><td>PENDING_ORDERS</td><td><code>NUMBER</code></td><td></td></tr>
 <tr><td>CANCELLED_ORDERS</td><td><code>NUMBER</code></td><td></td></tr>
-<tr><td>TOTAL_REVENUE</td><td><code>NUMBER</code></td><td></td></tr>
+<tr><td>TOTAL_REVENUE</td><td><code>NUMBER</code></td><td>当日总收入（仅已完成订单）</td></tr>
 <tr><td>AVG_ORDER_VALUE</td><td><code>NUMBER</code></td><td></td></tr>
 <tr><td>MAX_ORDER_VALUE</td><td><code>NUMBER</code></td><td></td></tr>
 <tr><td>MIN_ORDER_VALUE</td><td><code>NUMBER</code></td><td></td></tr>
-<tr><td>COMPLETION_RATE</td><td><code>NUMBER</code></td><td></td></tr>
-<tr><td>DBT_UPDATED_AT</td><td><code>TIMESTAMP_LTZ</code></td><td></td></tr>
+<tr><td>COMPLETION_RATE</td><td><code>NUMBER</code></td><td>订单完成率（百分比）</td></tr>
+<tr><td>DBT_UPDATED_AT</td><td><code>TIMESTAMP_LTZ</code></td><td>dbt 更新时间戳</td></tr>
 </tbody>
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 DEV_ANALYTICS.STG_CUSTOMERS <span class="badge badge-gray">VIEW</span></h3>
+            <h3>📋 DEV_ANALYTICS.STG_CUSTOMERS <span class="badge badge-gray">VIEW</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-danger">🔴 无数据</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;">清洗后的客户数据</p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -715,7 +741,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 DEV_ANALYTICS.STG_ORDERS <span class="badge badge-gray">VIEW</span></h3>
+            <h3>📋 DEV_ANALYTICS.STG_ORDERS <span class="badge badge-gray">VIEW</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-danger">🔴 无数据</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -729,7 +755,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 DEV_ANALYTICS.STG_ORDER_ITEMS <span class="badge badge-gray">VIEW</span></h3>
+            <h3>📋 DEV_ANALYTICS.STG_ORDER_ITEMS <span class="badge badge-gray">VIEW</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-danger">🔴 无数据</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -744,7 +770,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.CUSTOMER_FEEDBACK_SUMMARY <span class="badge badge-gray">BASE TABLE</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.CUSTOMER_FEEDBACK_SUMMARY <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-warning">🟡 注释不足</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -761,7 +787,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.CUSTOMER_RFM_ANALYSIS <span class="badge badge-gray">BASE TABLE</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.CUSTOMER_RFM_ANALYSIS <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-danger">🔴 无数据</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -782,7 +808,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.CUSTOMER_SUMMARY <span class="badge badge-gray">BASE TABLE</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.CUSTOMER_SUMMARY <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-warning">🟡 注释不足</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;">【Gold 层】客户汇总：订单统计+客户分类(VIP/Regular/One-time)</p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -805,7 +831,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.DAILY_SALES <span class="badge badge-gray">BASE TABLE</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.DAILY_SALES <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-warning">🟡 注释不足</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;">【Gold 层】每日销售汇总：订单数、客户数、收入、完成率</p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -825,7 +851,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.MONTHLY_SALES_TREND <span class="badge badge-gray">BASE TABLE</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.MONTHLY_SALES_TREND <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-danger">🔴 无数据</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -840,7 +866,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.NOTEBOOK_CUSTOMER_SUMMARY <span class="badge badge-gray">BASE TABLE</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.NOTEBOOK_CUSTOMER_SUMMARY <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-warning">🟡 注释不足</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -855,7 +881,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.NOTEBOOK_DAILY_SALES <span class="badge badge-gray">BASE TABLE</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.NOTEBOOK_DAILY_SALES <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-danger">🔴 无数据</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -868,7 +894,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.PRODUCT_SALES_ANALYSIS <span class="badge badge-gray">BASE TABLE</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.PRODUCT_SALES_ANALYSIS <span class="badge badge-gray">BASE TABLE</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-danger">🔴 无数据</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -887,7 +913,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.STG_CUSTOMERS <span class="badge badge-gray">VIEW</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.STG_CUSTOMERS <span class="badge badge-gray">VIEW</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-danger">🔴 无数据</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;">【Silver 层】客户清洗视图：标准化姓名和邮箱</p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -901,7 +927,7 @@
             </table>
         </div>
 <div class="subsection">
-            <h3>📋 PUBLIC_ANALYTICS.STG_CUSTOMER_FEEDBACK <span class="badge badge-gray">VIEW</span></h3>
+            <h3>📋 PUBLIC_ANALYTICS.STG_CUSTOMER_FEEDBACK <span class="badge badge-gray">VIEW</span> <span class="badge badge-gray">👤 未分配</span> <span class="badge badge-danger">🔴 无数据</span></h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;"><span style="color:#999;">无描述</span></p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -948,7 +974,7 @@
                 <div class="section-body">
                     <div class="metric-grid">
                         <div class="metric-card green">
-                            <div class="value">1.3s</div>
+                            <div class="value">1.5s</div>
                             <div class="label">平均查询响应</div>
                         </div>
                         <div class="metric-card blue">
@@ -969,6 +995,31 @@
                     </div>
                 </div>
             </div>
+
+            <!-- SQL 模板 -->
+            <div class="section">
+                <div class="section-header analyst-header">📋 常用 SQL 模板</div>
+                <div class="section-body">
+                    <div class="subsection">
+                        <h3>客户分析</h3>
+                        <pre style="background:#f8f9fa;padding:12px;border-radius:8px;font-size:0.82em;overflow-x:auto;"><code>SELECT customer_id, customer_name, total_orders, total_amount
+FROM PUBLIC_MARTS.CUSTOMER_SUMMARY
+ORDER BY total_amount DESC LIMIT 20;</code></pre>
+                    </div>
+                    <div class="subsection">
+                        <h3>销售趋势（按日）</h3>
+                        <pre style="background:#f8f9fa;padding:12px;border-radius:8px;font-size:0.82em;overflow-x:auto;"><code>SELECT order_date, COUNT(*) as order_count, SUM(amount) as revenue
+FROM ANALYTICS.ORDERS
+GROUP BY order_date ORDER BY order_date DESC LIMIT 30;</code></pre>
+                    </div>
+                    <div class="subsection">
+                        <h3>产品销售排名</h3>
+                        <pre style="background:#f8f9fa;padding:12px;border-radius:8px;font-size:0.82em;overflow-x:auto;"><code>SELECT p.product_name, COUNT(oi.order_id) as sold_count, SUM(oi.quantity * oi.unit_price) as revenue
+FROM ANALYTICS.ORDER_ITEMS oi JOIN ANALYTICS.PRODUCTS p ON oi.product_id = p.product_id
+GROUP BY 1 ORDER BY 3 DESC LIMIT 10;</code></pre>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
@@ -981,9 +1032,15 @@
         
         
         
+        
+        
+        
+        
+        
+        
         <div id="tab-governance" class="tab-content">
             <div class="role-score">
-                <div class="score-circle green">85</div>
+                <div class="score-circle yellow">75</div>
                 <div class="score-info">
                     <h2>🛡️ 数据治理官视图</h2>
                     <p>治理成熟度 · 安全合规 · 命名规范 · 权限管理 · 资产治理 · 血缘完整性</p>
@@ -995,10 +1052,10 @@
                 <div class="section-header gov-header">📌 本期关注</div>
                 <div class="section-body">
                     <ul style="list-style:none;padding:0;margin:0;">
-                        <li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🔴 MFA 0/4 用户启用，需立即处理</li>
-<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🔴 僵尸用户 GLUE_FEDERATION_USER 需清理</li>
-<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 6 张源表命名不合规</li>
-<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 元数据覆盖率低（字段注释 10.0%），治理成熟度受限</li>
+                        <li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🔴 MFA 0/6 用户启用，需立即处理</li>
+<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🔴 僵尸用户 USER_ALICE, USER_BOB 需清理</li>
+<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 6 张源表命名不合规：CUSTOMERS, CUSTOMER_FEEDBACK, ORDERS</li>
+<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">🟡 元数据覆盖率低（字段注释 11.4%），治理成熟度受限</li>
 <li style="padding:8px 0;font-size:0.95em;">📊 治理成熟度综合 L2（基础级），目标 6 个月内提升至 L3</li>
                     </ul>
                 </div>
@@ -1036,7 +1093,7 @@
                             <tr><td>数据分类</td><td><span class="badge badge-danger">L1 未启动</span></td><td>未配置 Data Classification</td><td>启用自动分类 → L3</td></tr>
                             <tr><td>访问控制</td><td><span class="badge badge-warning">L2 基础</span></td><td>有角色体系，无 MFA</td><td>启用 MFA + Network Policy → L3</td></tr>
                             <tr><td>质量监控</td><td><span class="badge badge-warning">L2 基础</span></td><td>dbt test 覆盖，无 DMF</td><td>启用 DMFs + 异常检测 → L3</td></tr>
-                            <tr><td>元数据管理</td><td><span class="badge badge-danger">L1 未启动</span></td><td>字段注释覆盖率 10.0%</td><td>补充注释 + Horizon Catalog → L3</td></tr>
+                            <tr><td>元数据管理</td><td><span class="badge badge-danger">L1 未启动</span></td><td>字段注释覆盖率 11.4%</td><td>补充注释 + Horizon Catalog → L3</td></tr>
                             <tr><td>血缘追踪</td><td><span class="badge badge-success">L3 完善</span></td><td>dbt ref + ACCESS_HISTORY 已启用</td><td>维持现状</td></tr>
                         </tbody>
                     </table>
@@ -1059,16 +1116,16 @@
                         <h3>安全配置检查</h3>
                         <div class="metric-grid">
                             <div class="metric-card red">
-                                <div class="value">0/4</div>
+                                <div class="value">0/6</div>
                                 <div class="label">MFA 启用用户</div>
                             </div>
                             <div class="metric-card red">
-                                <div class="value">1</div>
+                                <div class="value">3</div>
                                 <div class="label">僵尸用户</div>
                             </div>
                         </div>
                         <div class="finding-box danger">
-                            ❌ <strong>MFA 状态</strong>：0/4 用户启用多因素认证，严重安全风险。建议立即为所有用户启用 MFA。
+                            ❌ <strong>MFA 状态</strong>：0/6 用户启用多因素认证，严重安全风险。建议立即为所有用户启用 MFA。
                         </div>
                     </div>
                 </div>
@@ -1104,17 +1161,19 @@
                                 <tr><th>用户</th><th>默认角色</th><th>最后登录</th><th>状态</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td><strong>GLUE_FEDERATION_USER</strong></td><td>ICEBERG_READER_ROLE</td><td>从未登录</td><td><span class="badge badge-warning">僵尸</span></td></tr>
-<tr><td><strong>MYA</strong></td><td>ACCOUNTADMIN</td><td>2026-05-27</td><td><span class="badge badge-success">活跃</span></td></tr>
-<tr><td><strong>DBT_USER</strong></td><td>DBT_ROLE</td><td>2026-05-27</td><td><span class="badge badge-success">活跃</span></td></tr>
+                                <tr><td><strong>DBT_USER</strong></td><td>DBT_ROLE</td><td>2026-05-27</td><td><span class="badge badge-success">活跃</span></td></tr>
 <tr><td><strong>ANALYST_USER</strong></td><td>ANALYST_ROLE</td><td>2026-05-26</td><td><span class="badge badge-success">活跃</span></td></tr>
+<tr><td><strong>USER_ALICE</strong></td><td>DBT_ROLE</td><td>从未登录</td><td><span class="badge badge-warning">僵尸</span></td></tr>
+<tr><td><strong>USER_BOB</strong></td><td>DBT_ROLE</td><td>从未登录</td><td><span class="badge badge-warning">僵尸</span></td></tr>
+<tr><td><strong>MYA</strong></td><td>ACCOUNTADMIN</td><td>2026-05-27</td><td><span class="badge badge-success">活跃</span></td></tr>
+<tr><td><strong>GLUE_FEDERATION_USER</strong></td><td>ICEBERG_READER_ROLE</td><td>从未登录</td><td><span class="badge badge-warning">僵尸</span></td></tr>
 
                             </tbody>
                         </table>
                     </div>
-                    <div class="finding-box danger">⚠️ <strong>僵尸账户</strong>：GLUE_FEDERATION_USER 创建后从未登录，建议确认集成状态或禁用。</div>
+                    <div class="finding-box danger">⚠️ <strong>僵尸账户</strong>：USER_ALICE, USER_BOB, GLUE_FEDERATION_USER 创建后从未登录，建议确认集成状态或禁用。</div>
                     <div class="finding-box">
-                        ⚠️ <strong>角色膨胀</strong>：系统存在 67 个角色，仅 4 个用户，比例 16.8:1。建议清理未使用角色。
+                        ⚠️ <strong>角色膨胀</strong>：系统存在 67 个角色，仅 6 个用户，比例 11.2:1。建议清理未使用角色。
                     </div>
                 </div>
             </div>
@@ -1129,16 +1188,21 @@
                             <div class="label">冷表 (0行)</div>
                         </div>
                         <div class="metric-card red">
-                            <div class="value">10.0%</div>
+                            <div class="value">11.4%</div>
                             <div class="label">字段文档覆盖率</div>
                         </div>
                         <div class="metric-card red">
-                            <div class="value">23.2%</div>
+                            <div class="value">25.0%</div>
                             <div class="label">表文档覆盖率</div>
                         </div>
+                        <div class="metric-card red">
+                            <div class="value">0.0%</div>
+                            <div class="label">Owner 分配率</div>
+                        </div>
                     </div>
+                    <div class="finding-box">⚠️ <strong>Owner 分配</strong>：仅 0.0% 的表有明确负责人，建议为所有核心表分配 Owner tag。</div>
                     <div class="finding-box">⚠️ <strong>冷表</strong>：31 张表包含 0 行数据：CUSTOMER_RFM_ANALYSIS, MONTHLY_SALES_TREND, NOTEBOOK_DAILY_SALES, PRODUCT_SALES_ANALYSIS, ACCEPTED_VALUES_CUSTOMER_SUMMA_2C36B1BD57983D0C92608CD8F5E311B1...</div>
-                    <div class="finding-box danger">❌ <strong>文档覆盖率</strong>：字段注释仅 10.0%，远低于目标 80%+。建议优先为核心表添加注释。</div>
+                    <div class="finding-box danger">❌ <strong>文档覆盖率</strong>：字段注释仅 11.4%，远低于目标 80%+。建议优先为核心表添加注释。</div>
                 </div>
             </div>
 
@@ -1162,6 +1226,20 @@
                     <div class="finding-box success">
                         ✅ Snowflake ACCESS_HISTORY 已启用，支持查询级别的数据血缘追踪。
                     </div>
+                    <div class="subsection">
+                        <h3>Top 10 高影响力表（近 30 天）</h3>
+                        <table><thead><tr><th>表名</th><th>消费用户数</th><th>被查询次数</th><th>影响度</th></tr></thead><tbody><tr><td>MARKETING_DEMO.MARKETING.CAMPAIGN_SUMMARY</td><td>2</td><td>1071</td><td><span class="badge badge-danger">高</span></td></tr>
+<tr><td>MARKETING_DEMO.MARKETING.RAW_CUSTOMERS</td><td>2</td><td>722</td><td><span class="badge badge-danger">高</span></td></tr>
+<tr><td>MARKETING_DEMO.MARKETING.CUSTOMER_CAMPAIGNS</td><td>2</td><td>392</td><td><span class="badge badge-danger">高</span></td></tr>
+<tr><td>MARKETING_DEMO.MARKETING.RAW_CAMPAIGNS</td><td>2</td><td>367</td><td><span class="badge badge-danger">高</span></td></tr>
+<tr><td>QUICKSIGHT_DB.ANALYTICS.ORDERS</td><td>2</td><td>130</td><td><span class="badge badge-danger">高</span></td></tr>
+<tr><td>QUICKSIGHT_DB.ANALYTICS.CUSTOMERS</td><td>2</td><td>82</td><td><span class="badge badge-danger">高</span></td></tr>
+<tr><td>QUICKSIGHT_DB.PUBLIC_ANALYTICS.CUSTOMER_SUMMARY</td><td>2</td><td>56</td><td><span class="badge badge-danger">高</span></td></tr>
+<tr><td>QUICKSIGHT_DB.ANALYTICS.ORDER_ITEMS</td><td>2</td><td>40</td><td><span class="badge badge-warning">中</span></td></tr>
+<tr><td>QUICKSIGHT_DB.PUBLIC_ANALYTICS.DAILY_SALES</td><td>2</td><td>24</td><td><span class="badge badge-warning">中</span></td></tr>
+<tr><td>QUICKSIGHT_DB.ANALYTICS.PROMOTIONS</td><td>1</td><td>16</td><td><span class="badge badge-gray">低</span></td></tr>
+</tbody></table>
+                    </div>
                 </div>
             </div>
 
@@ -1173,7 +1251,7 @@
                         <thead><tr><th>优先级</th><th>行动项</th><th>预期效果</th><th>建议时间</th></tr></thead>
                         <tbody>
                             <tr><td><span class="badge badge-danger">P0</span></td><td>为所有用户启用 MFA</td><td>安全评分 +15</td><td>本周</td></tr>
-                            <tr><td><span class="badge badge-danger">P0</span></td><td>清理僵尸用户 (GLUE_FEDERATION_USER)</td><td>安全评分 +5</td><td>本周</td></tr>
+                            <tr><td><span class="badge badge-danger">P0</span></td><td>清理僵尸用户 (USER_ALICE, USER_BOB, GLUE_FEDERATION_USER)</td><td>安全评分 +5</td><td>本周</td></tr>
                             <tr><td><span class="badge badge-warning">P1</span></td><td>ODS 表添加 ods_ 前缀（6 张表）</td><td>命名合规率 → 100%</td><td>2 周内</td></tr>
                             <tr><td><span class="badge badge-warning">P1</span></td><td>补充核心表字段注释（目标 50%+）</td><td>元数据成熟度 L1→L2</td><td>1 个月</td></tr>
                             <tr><td><span class="badge badge-info">P2</span></td><td>启用 Snowflake Data Classification</td><td>数据分类成熟度 L1→L3</td><td>1 个月</td></tr>
@@ -1182,7 +1260,7 @@
                         </tbody>
                     </table>
                     <div class="finding-box info">
-                        📅 <strong>下次巡检目标</strong>：完成 P0+P1 项后，预计综合评分从 71 → 86，治理成熟度从 L2 → L2.5。
+                        📅 <strong>下次巡检目标</strong>：完成 P0+P1 项后，预计综合评分从 69 → 84，治理成熟度从 L2 → L2.5。
                     </div>
                 </div>
             </div>
@@ -1200,9 +1278,15 @@
         
         
         
+        
+        
+        
+        
+        
+        
         <div id="tab-executive" class="tab-content">
             <div class="role-score">
-                <div class="score-circle yellow">71</div>
+                <div class="score-circle yellow">69</div>
                 <div class="score-info">
                     <h2>💼 管理层视图</h2>
                     <p>本月概要 · 成本与ROI · 风险与行动项 · 健康度趋势</p>
@@ -1214,15 +1298,15 @@
                 <div class="section-header exec-header">📌 本月概要</div>
                 <div class="section-body">
                     <div class="finding-box info">
-                        📋 <strong>本月数据仓库综合健康评分 71/100，存在 5 项待处理风险。</strong>
+                        📋 <strong>本月数据仓库综合健康评分 69/100，存在 5 项待处理风险。</strong>
                     </div>
                     <div class="metric-grid">
                         <div class="metric-card yellow">
-                            <div class="value">71</div>
+                            <div class="value">69</div>
                             <div class="label">综合健康分</div>
                         </div>
                         <div class="metric-card green">
-                            <div class="value">~$53</div>
+                            <div class="value">~$55</div>
                             <div class="label">本月成本</div>
                         </div>
                         <div class="metric-card red">
@@ -1241,15 +1325,15 @@
                         <h3>成本总额</h3>
                         <div class="metric-grid">
                             <div class="metric-card green">
-                                <div class="value">17.68</div>
+                                <div class="value">18.44</div>
                                 <div class="label">本月 Credits</div>
                             </div>
                             <div class="metric-card green">
-                                <div class="value">~$53.05</div>
+                                <div class="value">~$55.32</div>
                                 <div class="label">本月费用</div>
                             </div>
                             <div class="metric-card green">
-                                <div class="value">~$637</div>
+                                <div class="value">~$664</div>
                                 <div class="label">年度预测</div>
                             </div>
                         </div>
@@ -1258,11 +1342,11 @@
                         <h3>ROI 指标</h3>
                         <div class="metric-grid">
                             <div class="metric-card blue">
-                                <div class="value">0.6</div>
+                                <div class="value">0.5</div>
                                 <div class="label">查询数/Credit</div>
                             </div>
                             <div class="metric-card blue">
-                                <div class="value">8</div>
+                                <div class="value">10</div>
                                 <div class="label">产出行数/Credit</div>
                             </div>
                             <div class="metric-card blue">
@@ -1276,18 +1360,18 @@
                         <div class="bar-chart">
                             <div class="bar-item">
                 <span class="bar-label">MARKETING_ETL_WH</span>
-                <div class="bar-track"><div class="bar-fill low" style="width: 48%;">48%</div></div>
-                <span class="bar-value">8.54 credits (48%)</span>
+                <div class="bar-track"><div class="bar-fill low" style="width: 46%;">46%</div></div>
+                <span class="bar-value">8.54 credits (46%)</span>
             </div>
 <div class="bar-item">
                 <span class="bar-label">COMPUTE_WH</span>
-                <div class="bar-track"><div class="bar-fill green" style="width: 42%;">42%</div></div>
-                <span class="bar-value">7.38 credits (42%)</span>
+                <div class="bar-track"><div class="bar-fill green" style="width: 44%;">44%</div></div>
+                <span class="bar-value">8.14 credits (44%)</span>
             </div>
 <div class="bar-item">
                 <span class="bar-label">MARKETING_BI_WH</span>
-                <div class="bar-track"><div class="bar-fill purple" style="width: 9%;">9%</div></div>
-                <span class="bar-value">1.53 credits (9%)</span>
+                <div class="bar-track"><div class="bar-fill purple" style="width: 8%;">8%</div></div>
+                <span class="bar-value">1.53 credits (8%)</span>
             </div>
 <div class="bar-item">
                 <span class="bar-label">MARKETING_BI_WH_M</span>
@@ -1306,19 +1390,19 @@
                         <h3>按用户归因</h3>
                         <div class="bar-chart">
                             <div class="bar-item">
-                <span class="bar-label">SYSTEM</span>
+                <span class="bar-label">MYA</span>
                 <div class="bar-track"><div class="bar-fill low" style="width: 100%;">100%</div></div>
-                <span class="bar-value">0.0429 credits / 27078 queries</span>
+                <span class="bar-value">0.0533 credits / 7598 queries</span>
             </div>
 <div class="bar-item">
-                <span class="bar-label">MYA</span>
-                <div class="bar-track"><div class="bar-fill green" style="width: 96%;">96%</div></div>
-                <span class="bar-value">0.0411 credits / 7498 queries</span>
+                <span class="bar-label">SYSTEM</span>
+                <div class="bar-track"><div class="bar-fill green" style="width: 81%;">81%</div></div>
+                <span class="bar-value">0.0429 credits / 27081 queries</span>
             </div>
 <div class="bar-item">
                 <span class="bar-label">DBT_USER</span>
-                <div class="bar-track"><div class="bar-fill purple" style="width: 10%;">10%</div></div>
-                <span class="bar-value">0.0043 credits / 428 queries</span>
+                <div class="bar-track"><div class="bar-fill purple" style="width: 9%;">9%</div></div>
+                <span class="bar-value">0.0046 credits / 441 queries</span>
             </div>
 <div class="bar-item">
                 <span class="bar-label">FIRST_USER</span>
@@ -1333,6 +1417,20 @@
 
                         </div>
                     </div>
+                    <div class="subsection">
+                        <h3>成本趋势 & 预测</h3>
+                        <div class="metric-grid">
+                            <div class="metric-card blue">
+                                <div class="value">1.15</div>
+                                <div class="label">日均 Credits</div>
+                            </div>
+                            <div class="metric-card green">
+                                <div class="value">安全</div>
+                                <div class="label">预算状态 (50cr/月)</div>
+                            </div>
+                        </div>
+                        <div class="finding-box success">✅ 近 30 天无异常消耗日（无单日超日均 3 倍）。</div>
+                    </div>
                 </div>
             </div>
 
@@ -1344,9 +1442,9 @@
                         <thead><tr><th>级别</th><th>维度</th><th>问题</th><th>建议动作</th></tr></thead>
                         <tbody>
                             <tr><td>🔴</td><td>安全</td><td>MFA 0% 启用，严重安全隐患</td><td>立即为所有用户启用 MFA</td></tr>
-<tr><td>🔴</td><td>安全</td><td>僵尸用户 GLUE_FEDERATION_USER 从未登录</td><td>建议禁用或删除</td></tr>
+<tr><td>🔴</td><td>安全</td><td>僵尸用户 USER_ALICE, USER_BOB 从未登录</td><td>建议禁用或删除</td></tr>
 <tr><td>🟡</td><td>规范</td><td>6 张源表缺少 ods_ 前缀</td><td>按命名规范重命名</td></tr>
-<tr><td>🟡</td><td>治理</td><td>字段文档覆盖率仅 10.0%</td><td>优先补充核心表注释</td></tr>
+<tr><td>🟡</td><td>治理</td><td>字段文档覆盖率仅 11.4%</td><td>优先补充核心表注释</td></tr>
 <tr><td>🟡</td><td>运营</td><td>31 张冷表（0行数据）占用资源</td><td>评估后归档或删除</td></tr>
 
                         </tbody>
@@ -1376,19 +1474,19 @@
         </div>
 <div class="bar-item">
             <span class="bar-label">运营效率</span>
-            <div class="bar-track"><div class="bar-fill medium" style="width: 73%;">73</div></div>
-            <span class="bar-value">73/100</span>
+            <div class="bar-track"><div class="bar-fill medium" style="width: 75%;">75</div></div>
+            <span class="bar-value">75/100</span>
         </div>
 <div class="bar-item">
             <span class="bar-label">安全合规</span>
-            <div class="bar-track"><div class="bar-fill green" style="width: 85%;">85</div></div>
-            <span class="bar-value">85/100</span>
+            <div class="bar-track"><div class="bar-fill medium" style="width: 75%;">75</div></div>
+            <span class="bar-value">75/100</span>
         </div>
 
                         </div>
                     </div>
                     <div class="finding-box info">
-                        📊 趋势数据将在下次巡检后展示对比。当前综合评分：<strong>71/100</strong>
+                        📊 趋势数据将在下次巡检后展示对比。当前综合评分：<strong>69/100</strong>
                     </div>
                 </div>
             </div>
@@ -1396,30 +1494,9 @@
 
 
         <!-- Footer -->
-        <div class="footer">
-            <h2>📋 巡检总结</h2>
-            <div class="footer-grid">
-                <div class="footer-item">
-                    <div class="label">综合健康评分</div>
-                    <div class="value" style="color: #f39c12;">77 / 100</div>
-                </div>
-                <div class="footer-item">
-                    <div class="label">上次巡检对比</div>
-                    <div class="value" style="color: #27ae60;">↑ +7 分 (上月 70)</div>
-                </div>
-                <div class="footer-item">
-                    <div class="label">下次巡检时间</div>
-                    <div class="value" style="color: #3498db;">2026-06-03</div>
-                </div>
-                <div class="footer-item">
-                    <div class="label">报告生成时间</div>
-                    <div class="value" style="color: #a0aec0;">2026-05-28 10:30:19 CST</div>
-                </div>
-            </div>
-            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.85em; color: #a0aec0;">
-                <p>⚡ 优先改进项：① 启用 MFA (安全) ② 提升文档覆盖率至 80%+ (治理) ③ 修复 MONTHLY_SALES_TREND 刷新 (运营)</p>
-                <p style="margin-top: 8px;">🤖 本报告由 Kiro AI + Snowflake 自动化巡检系统生成 | QUICKSIGHT_DB | v2.0</p>
-            </div>
+        <div class="footer" style="padding:20px 40px; background:#1a1a2e; color:white; text-align:center; font-size:0.85em;">
+            <p>报告生成时间: 2026-05-28 11:13:39 CST | 账户: RUKQCBI-WS06286</p>
+            <p style="margin-top:8px; opacity:0.7;">⚡ 优先改进项：① 启用 MFA (安全) ② 提升文档覆盖率至 80%+ (治理) ③ 修复冷表 (运营)</p>
         </div>
     </div>
 

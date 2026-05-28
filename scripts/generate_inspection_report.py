@@ -239,6 +239,81 @@ def fetch_dbt_runs(cur):
         return 0
 
 
+def fetch_table_owners(cur):
+    """获取表 Owner 标签"""
+    try:
+        cur.execute("""
+            SELECT object_schema, object_name, tag_value AS owner
+            FROM SNOWFLAKE.ACCOUNT_USAGE.TAG_REFERENCES
+            WHERE tag_name = 'OWNER' 
+              AND domain = 'TABLE'
+              AND object_database = 'QUICKSIGHT_DB'
+            ORDER BY object_schema, object_name
+        """)
+        return [dict(zip(['schema', 'table', 'owner'], r)) for r in cur]
+    except Exception as e:
+        print(f"   ⚠️  获取 Owner 标签失败: {e}")
+        return []
+
+
+def fetch_daily_credits(cur):
+    """获取每日 credit 消耗（30天）"""
+    try:
+        cur.execute("""
+            SELECT TO_DATE(start_time) as usage_date, SUM(credits_used) as daily_credits
+            FROM SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY
+            WHERE start_time >= DATEADD(day, -30, CURRENT_DATE())
+            GROUP BY 1 ORDER BY 1
+        """)
+        return [dict(zip(['date', 'credits'], r)) for r in cur]
+    except Exception as e:
+        print(f"   ⚠️  获取每日消耗失败: {e}")
+        return []
+
+
+def fetch_repeated_queries(cur):
+    """检测重复执行的查询（相同 SQL hash 执行多次）"""
+    try:
+        cur.execute("""
+            SELECT query_parameterized_hash, COUNT(*) as exec_count, 
+                   ANY_VALUE(SUBSTR(query_text, 1, 150)) as sample_sql,
+                   ANY_VALUE(user_name) as user_name,
+                   AVG(execution_time)/1000.0 as avg_seconds
+            FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY
+            WHERE start_time >= DATEADD(day, -7, CURRENT_DATE())
+              AND execution_status = 'SUCCESS'
+              AND user_name NOT IN ('SYSTEM', 'SNOWFLAKE')
+              AND query_type = 'SELECT'
+            GROUP BY 1
+            HAVING COUNT(*) >= 10
+            ORDER BY 2 DESC
+            LIMIT 5
+        """)
+        return [dict(zip(['hash', 'count', 'sql', 'user', 'avg_seconds'], r)) for r in cur]
+    except Exception as e:
+        print(f"   ⚠️  获取重复查询失败: {e}")
+        return []
+
+
+def fetch_downstream_consumers(cur):
+    """获取每张表被多少不同用户/查询消费"""
+    try:
+        cur.execute("""
+            SELECT obj.value:objectName::STRING as table_name,
+                   COUNT(DISTINCT user_name) as consumer_count,
+                   COUNT(*) as query_count
+            FROM SNOWFLAKE.ACCOUNT_USAGE.ACCESS_HISTORY,
+                 LATERAL FLATTEN(input => base_objects_accessed) obj
+            WHERE query_start_time >= DATEADD(day, -30, CURRENT_DATE())
+              AND obj.value:objectDomain::STRING = 'Table'
+            GROUP BY 1 ORDER BY 3 DESC LIMIT 10
+        """)
+        return [dict(zip(['table', 'consumers', 'queries'], r)) for r in cur]
+    except Exception as e:
+        print(f"   ⚠️  获取下游消费者失败: {e}")
+        return []
+
+
 # ============================================
 # 指标计算
 # ============================================
@@ -395,17 +470,32 @@ def generate_engineer_tab(data):
         spill_mb = round((spill_local + spill_remote) / 1024 / 1024, 2)
         wh_perf_html += f'<tr><td><strong>{w["warehouse"]}</strong></td><td>{queue:.2f}s</td><td>{spill_mb} MB</td></tr>\n'
 
-    # Engineer highlights
+    # Engineer highlights (with owner attribution)
+    table_owners = data.get('table_owners', [])
+    def get_owner(table_name, schema=None):
+        for o in table_owners:
+            if o['table'] == table_name and (schema is None or o['schema'] == schema):
+                return o['owner']
+        return None
+
     eng_highlights = []
     slow = [q for q in queries if float(q.get('seconds', 0) or 0) > 5]
     if slow:
         eng_highlights.append(f"🔴 {len(slow)} 条慢查询 (>5s)，建议优化 SQL 或调整 Warehouse 规格")
     cold_biz = [t for t in data.get('cold_tables', []) if not t['name'].startswith(('NOT_NULL_', 'UNIQUE_', 'ACCEPTED_'))]
     if cold_biz:
-        eng_highlights.append(f"🟡 {len(cold_biz)} 张业务表无数据，可能需要检查 DAG 调度")
-    eng_highlights.append("💡 建议启用 Snowflake DMFs（Data Metric Functions）实现持续自动化质量监控")
+        cold_details = []
+        for t in cold_biz[:3]:
+            owner = get_owner(t['name'], t.get('schema'))
+            cold_details.append(f"{t['name']}{' → @'+owner if owner else ''}")
+        eng_highlights.append(f"🟡 {len(cold_biz)} 张业务表无数据：{', '.join(cold_details)}，请检查 DAG 调度")
     if schema_changes:
-        eng_highlights.append(f"📝 近 7 天有 {len(schema_changes)} 项 Schema 变更，请确认是否符合预期")
+        affected = list(set(c['table'] for c in schema_changes))[:3]
+        owners_involved = set(filter(None, (get_owner(t) for t in affected)))
+        owner_mention = f" → {'、'.join('@'+o for o in owners_involved)} 请确认" if owners_involved else ""
+        eng_highlights.append(f"📝 近 7 天有 {len(schema_changes)} 项 Schema 变更{owner_mention}")
+    if not eng_highlights:
+        eng_highlights.append("✅ 本期无重大工程问题，各指标正常")
 
     highlights_li = '\n'.join(f'<li style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.95em;">{h}</li>' for h in eng_highlights)
     if eng_highlights:
@@ -416,6 +506,14 @@ def generate_engineer_tab(data):
     changes_html = ''
     for c in schema_changes[:10]:
         changes_html += f'<tr><td><span class="badge badge-info">变更</span></td><td>{c["schema"]}.{c["table"]}</td><td>{c.get("type","")}</td><td>{c.get("date","")}</td></tr>\n'
+
+    # Repeated queries
+    repeated_queries = data.get('repeated_queries', [])
+    repeated_html = ''
+    for rq in repeated_queries[:5]:
+        sql = (rq.get('sql') or '').replace('<', '&lt;').replace('>', '&gt;')
+        avg_s = float(rq.get('avg_seconds', 0) or 0)
+        repeated_html += f'<tr><td>{rq["count"]}</td><td>{rq.get("user","")}</td><td>{avg_s:.1f}s</td><td><code style="font-size:0.75em;word-break:break-all;">{sql}</code></td></tr>\n'
 
     return f'''
         <div id="tab-engineer" class="tab-content active">
@@ -537,6 +635,15 @@ def generate_engineer_tab(data):
                 </div>
             </div>
 
+            <!-- 重复查询检测 -->
+            <div class="section">
+                <div class="section-header eng-header">🔄 重复查询检测（近 7 天执行 ≥10 次）</div>
+                <div class="section-body">
+                    {('<table><thead><tr><th>执行次数</th><th>用户</th><th>平均耗时</th><th>SQL 样本</th></tr></thead><tbody>' + repeated_html + '</tbody></table>') if repeated_html else '<div class="finding-box success">✅ 未检测到高频重复查询（同一 SQL 执行 ≥10 次）。</div>'}
+                    {('<div class="finding-box">💡 <strong>优化建议</strong>：高频重复查询建议使用 Result Cache 或创建物化视图减少重复计算。</div>') if repeated_html else ''}
+                </div>
+            </div>
+
             <!-- 变更追踪 -->
             <div class="section">
                 <div class="section-header eng-header">📝 Schema 变更追踪（最近 7 天）</div>
@@ -563,6 +670,7 @@ def generate_analyst_tab(data):
     # Gold layer tables (PUBLIC_MARTS)
     gold_schemas = ['PUBLIC_MARTS', 'PUBLIC_ANALYTICS', 'DEV_ANALYTICS']
     gold_tables = [t for t in tables if t['schema'] in gold_schemas]
+    table_owners = data.get('table_owners', [])
     
     # Comment coverage by schema
     coverage_bars = ''
@@ -575,13 +683,17 @@ def generate_analyst_tab(data):
             <span class="bar-value">{info['with_comment']}/{info['total']}</span>
         </div>\n'''
 
-    # Analyst highlights
+    # Analyst highlights (with owner attribution)
     analyst_highlights = []
     if comments['columns_rate'] < 30:
         analyst_highlights.append(f"🟡 字段注释覆盖率仅 {comments['columns_rate']}%，查找字段含义可能困难")
     empty_gold = [t for t in gold_tables if (t['rows'] or 0) == 0]
     if empty_gold:
-        analyst_highlights.append(f"🟡 {len(empty_gold)} 张 Gold 层表为空，暂不可用于分析")
+        details = []
+        for t in empty_gold[:3]:
+            owner = next((o['owner'] for o in table_owners if o['table'] == t['name'] and o['schema'] == t['schema']), None)
+            details.append(f"{t['name']}{' → @'+owner if owner else ''}")
+        analyst_highlights.append(f"🟡 {len(empty_gold)} 张 Gold 层表为空：{', '.join(details)}")
     if comments['tables_rate'] < 50:
         analyst_highlights.append(f"💡 表注释覆盖率 {comments['tables_rate']}%，建议参考数据字典了解各表用途")
     analyst_highlights.append("📖 本报告包含完整数据字典，可直接查阅 Gold 层表结构和字段说明")
@@ -600,12 +712,23 @@ def generate_analyst_tab(data):
         if not tbl_cols:
             continue
         tbl_comment = tbl.get('comment') or '<span style="color:#999;">无描述</span>'
+        owner = next((o['owner'] for o in table_owners if o['table'] == tbl['name'] and o['schema'] == tbl['schema']), None)
+        owner_badge = f'<span class="badge badge-info">👤 {owner}</span>' if owner else '<span class="badge badge-gray">👤 未分配</span>'
+        # Quality badge
+        cols_with_comment = sum(1 for c in tbl_cols if c.get('comment'))
+        col_coverage = cols_with_comment / max(len(tbl_cols), 1)
+        if (tbl.get('rows') or 0) == 0:
+            quality_badge = '<span class="badge badge-danger">🔴 无数据</span>'
+        elif col_coverage < 0.5:
+            quality_badge = '<span class="badge badge-warning">🟡 注释不足</span>'
+        else:
+            quality_badge = '<span class="badge badge-success">🟢 良好</span>'
         cols_rows = ''
         for col in tbl_cols[:20]:
             col_comment = col.get('comment') or ''
             cols_rows += f'<tr><td>{col["column"]}</td><td><code>{col["type"]}</code></td><td>{col_comment}</td></tr>\n'
         dict_html += f'''<div class="subsection">
-            <h3>📋 {tbl['schema']}.{tbl['name']} <span class="badge badge-gray">{tbl['type']}</span></h3>
+            <h3>📋 {tbl['schema']}.{tbl['name']} <span class="badge badge-gray">{tbl['type']}</span> {owner_badge} {quality_badge}</h3>
             <p style="margin-bottom:8px;color:#555;font-size:0.9em;">{tbl_comment}</p>
             <table>
                 <thead><tr><th>字段名</th><th>类型</th><th>说明</th></tr></thead>
@@ -743,6 +866,31 @@ def generate_analyst_tab(data):
                     </div>
                 </div>
             </div>
+
+            <!-- SQL 模板 -->
+            <div class="section">
+                <div class="section-header analyst-header">📋 常用 SQL 模板</div>
+                <div class="section-body">
+                    <div class="subsection">
+                        <h3>客户分析</h3>
+                        <pre style="background:#f8f9fa;padding:12px;border-radius:8px;font-size:0.82em;overflow-x:auto;"><code>SELECT customer_id, customer_name, total_orders, total_amount
+FROM PUBLIC_MARTS.CUSTOMER_SUMMARY
+ORDER BY total_amount DESC LIMIT 20;</code></pre>
+                    </div>
+                    <div class="subsection">
+                        <h3>销售趋势（按日）</h3>
+                        <pre style="background:#f8f9fa;padding:12px;border-radius:8px;font-size:0.82em;overflow-x:auto;"><code>SELECT order_date, COUNT(*) as order_count, SUM(amount) as revenue
+FROM ANALYTICS.ORDERS
+GROUP BY order_date ORDER BY order_date DESC LIMIT 30;</code></pre>
+                    </div>
+                    <div class="subsection">
+                        <h3>产品销售排名</h3>
+                        <pre style="background:#f8f9fa;padding:12px;border-radius:8px;font-size:0.82em;overflow-x:auto;"><code>SELECT p.product_name, COUNT(oi.order_id) as sold_count, SUM(oi.quantity * oi.unit_price) as revenue
+FROM ANALYTICS.ORDER_ITEMS oi JOIN ANALYTICS.PRODUCTS p ON oi.product_id = p.product_id
+GROUP BY 1 ORDER BY 3 DESC LIMIT 10;</code></pre>
+                    </div>
+                </div>
+            </div>
         </div>'''
 
 
@@ -758,6 +906,16 @@ def generate_governance_tab(data):
     cold_tables = data['cold_tables']
     tables = data['tables']
     scores = data['scores']
+    table_owners = data.get('table_owners', [])
+    downstream = data.get('downstream', [])
+
+    # Downstream consumers HTML
+    downstream_html = ''
+    for d in downstream[:10]:
+        q = int(d.get('queries', 0) or 0)
+        badge = 'badge-danger' if q > 50 else ('badge-warning' if q >= 20 else 'badge-gray')
+        level = '高' if q > 50 else ('中' if q >= 20 else '低')
+        downstream_html += f'<tr><td>{d["table"]}</td><td>{d.get("consumers", 0)}</td><td>{q}</td><td><span class="badge {badge}">{level}</span></td></tr>\n'
 
     # Login failures table
     login_fail_html = ''
@@ -795,13 +953,18 @@ def generate_governance_tab(data):
     stg_badge, stg_text = badge_for_rate(stg_rate)
     schema_badge, schema_text = badge_for_rate(schema_rate)
 
-    # Governance highlights
+    # Governance highlights (with owner attribution)
     gov_highlights = []
     gov_highlights.append(f"🔴 MFA 0/{len(users)} 用户启用，需立即处理")
     if zombie_users:
         gov_highlights.append(f"🔴 僵尸用户 {', '.join(u['name'] for u in zombie_users[:2])} 需清理")
     if naming['ods_prefix']['violations']:
-        gov_highlights.append(f"🟡 {len(naming['ods_prefix']['violations'])} 张源表命名不合规")
+        violations = naming['ods_prefix']['violations'][:3]
+        v_details = []
+        for v in violations:
+            owner = next((o['owner'] for o in table_owners if o['table'] == v), None)
+            v_details.append(f"{v}{' → @'+owner if owner else ''}")
+        gov_highlights.append(f"🟡 {len(naming['ods_prefix']['violations'])} 张源表命名不合规：{', '.join(v_details)}")
     if comments['columns_rate'] < 30:
         gov_highlights.append(f"🟡 元数据覆盖率低（字段注释 {comments['columns_rate']}%），治理成熟度受限")
     gov_highlights.append(f"📊 治理成熟度综合 L2（基础级），目标 6 个月内提升至 L3")
@@ -958,7 +1121,12 @@ def generate_governance_tab(data):
                             <div class="value">{comments['tables_rate']}%</div>
                             <div class="label">表文档覆盖率</div>
                         </div>
+                        <div class="metric-card {'green' if len(set((o['schema'],o['table']) for o in table_owners))/max(len(tables),1)*100 >= 80 else ('yellow' if len(set((o['schema'],o['table']) for o in table_owners))/max(len(tables),1)*100 >= 50 else 'red')}">
+                            <div class="value">{round(len(set((o['schema'],o['table']) for o in table_owners))/max(len(tables),1)*100,1)}%</div>
+                            <div class="label">Owner 分配率</div>
+                        </div>
                     </div>
+                    {'<div class="finding-box">⚠️ <strong>Owner 分配</strong>：仅 ' + str(round(len(set((o["schema"],o["table"]) for o in table_owners))/max(len(tables),1)*100,1)) + '% 的表有明确负责人，建议为所有核心表分配 Owner tag。</div>' if len(set((o['schema'],o['table']) for o in table_owners))/max(len(tables),1)*100 < 50 else ''}
                     {'<div class="finding-box">⚠️ <strong>冷表</strong>：' + str(len(cold_tables)) + ' 张表包含 0 行数据：' + ", ".join(t["name"] for t in cold_tables[:5]) + ("..." if len(cold_tables) > 5 else "") + '</div>' if cold_tables else ''}
                     {'<div class="finding-box danger">❌ <strong>文档覆盖率</strong>：字段注释仅 ' + str(comments["columns_rate"]) + '%，远低于目标 80%+。建议优先为核心表添加注释。</div>' if comments['columns_rate'] < 50 else ''}
                 </div>
@@ -983,6 +1151,10 @@ def generate_governance_tab(data):
                     </div>
                     <div class="finding-box success">
                         ✅ Snowflake ACCESS_HISTORY 已启用，支持查询级别的数据血缘追踪。
+                    </div>
+                    <div class="subsection">
+                        <h3>Top 10 高影响力表（近 30 天）</h3>
+                        {('<table><thead><tr><th>表名</th><th>消费用户数</th><th>被查询次数</th><th>影响度</th></tr></thead><tbody>' + downstream_html + '</tbody></table>') if downstream_html else '<p style="color:#999;">暂无 ACCESS_HISTORY 数据</p>'}
                     </div>
                 </div>
             </div>
@@ -1024,6 +1196,27 @@ def generate_executive_tab(data):
     users = data['users']
     columns = data['columns']
     cold_tables = data.get('cold_tables', [])
+
+    # Daily credits for burn rate
+    daily_credits = data.get('daily_credits', [])
+    daily_avg = total_credits / max(len(daily_credits), 1) if daily_credits else total_credits / 30
+    budget = 50  # monthly budget in credits
+    if daily_avg > 0:
+        days_to_budget = round(budget / daily_avg)
+        budget_status = '安全' if days_to_budget > 30 else f'第{days_to_budget}天超预算'
+        budget_color = 'green' if days_to_budget > 30 else 'red'
+    else:
+        budget_status = '安全'
+        budget_color = 'green'
+    # Anomaly detection: days > 3x average
+    anomaly_days = [d for d in daily_credits if float(d['credits']) > daily_avg * 3] if daily_credits else []
+    anomaly_html = ''
+    if anomaly_days:
+        for d in anomaly_days[:3]:
+            cr = float(d['credits'])
+            anomaly_html += f'<div class="finding-box danger">⚠️ <strong>异常消耗日</strong>：{d["date"]} 消耗 {cr:.2f} credits（日均的 {cr/max(daily_avg,0.01):.1f} 倍），建议排查该日查询。</div>\n'
+    else:
+        anomaly_html = '<div class="finding-box success">✅ 近 30 天无异常消耗日（无单日超日均 3 倍）。</div>'
 
     score_color = 'green' if scores['overall'] >= 75 else ('yellow' if scores['overall'] >= 60 else 'red')
 
@@ -1202,6 +1395,20 @@ def generate_executive_tab(data):
                             {user_bars if user_bars else '<p style="color:#999;">暂无数据</p>'}
                         </div>
                     </div>
+                    <div class="subsection">
+                        <h3>成本趋势 & 预测</h3>
+                        <div class="metric-grid">
+                            <div class="metric-card blue">
+                                <div class="value">{daily_avg:.2f}</div>
+                                <div class="label">日均 Credits</div>
+                            </div>
+                            <div class="metric-card {budget_color}">
+                                <div class="value">{budget_status}</div>
+                                <div class="label">预算状态 ({budget}cr/月)</div>
+                            </div>
+                        </div>
+                        {anomaly_html}
+                    </div>
                 </div>
             </div>
 
@@ -1280,6 +1487,32 @@ def generate_html(data):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     html = re.sub(r'2026-05-\d{2} \d{2}:\d{2}(:\d{2})? CST', f'{now} CST', html)
 
+    # Replace header
+    html = re.sub(
+        r'<div class="header">.*?</div>\s*\n\s*\n\s*<!-- Tab',
+        f'''<div class="header">
+            <h1>❄️ Snowflake 运营巡检报告</h1>
+            <div class="subtitle">账户: {ACCOUNT} | {now} CST</div>
+        </div>
+
+        <!-- Tab''',
+        html, flags=re.DOTALL
+    )
+
+    # Replace footer
+    html = re.sub(
+        r'<!-- Footer -->.*?</div>\s*</div>\s*\n\s*<!-- JavaScript',
+        f'''<!-- Footer -->
+        <div class="footer" style="padding:20px 40px; background:#1a1a2e; color:white; text-align:center; font-size:0.85em;">
+            <p>报告生成时间: {now} CST | 账户: {ACCOUNT}</p>
+            <p style="margin-top:8px; opacity:0.7;">⚡ 优先改进项：① 启用 MFA (安全) ② 提升文档覆盖率至 80%+ (治理) ③ 修复冷表 (运营)</p>
+        </div>
+    </div>
+
+    <!-- JavaScript''',
+        html, flags=re.DOTALL
+    )
+
     return html
 
 
@@ -1330,6 +1563,18 @@ def main():
     
     dbt_runs = fetch_dbt_runs(cur)
     print(f"   ✅ dbt runs (7天): {dbt_runs} 次")
+    
+    table_owners = fetch_table_owners(cur)
+    print(f"   ✅ Owner 标签: {len(table_owners)} 个")
+    
+    daily_credits = fetch_daily_credits(cur)
+    print(f"   ✅ 每日消耗: {len(daily_credits)} 天")
+    
+    repeated_queries = fetch_repeated_queries(cur)
+    print(f"   ✅ 重复查询: {len(repeated_queries)} 个")
+    
+    downstream = fetch_downstream_consumers(cur)
+    print(f"   ✅ 下游消费者: {len(downstream)} 个")
     
     conn.close()
     
@@ -1400,6 +1645,10 @@ def main():
         'cold_tables': cold,
         'logins': logins,
         'dbt_runs': dbt_runs,
+        'table_owners': table_owners,
+        'daily_credits': daily_credits,
+        'repeated_queries': repeated_queries,
+        'downstream': downstream,
     }
     html = generate_html(html_data)
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -1434,6 +1683,8 @@ def main():
         "total_columns": len(columns),
         "total_users": len(users),
         "total_roles": len(roles),
+        "table_owners": {f"{o['schema']}.{o['table']}": o['owner'] for o in table_owners},
+        "owner_coverage_rate": round(len(set((o['schema'],o['table']) for o in table_owners))/max(len(tables),1)*100, 1),
     }
     
     with open(metrics_path, 'w', encoding='utf-8') as f:
