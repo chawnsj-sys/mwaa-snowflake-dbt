@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: stg_customers
-    description: 清洗后的客户数据
+    description: 客户维度表（incremental merge）
     columns:
       - name: customer_id
         description: 客户唯一标识
@@ -10,32 +10,33 @@ models:
           - unique
           - not_null
       - name: customer_name
-        description: 标准化的客户姓名（大写）
+        description: 客户姓名
         tests:
           - not_null
       - name: email
-        description: 标准化的邮箱（小写）
+        description: 邮箱（小写）
         tests:
           - not_null
-      - name: dbt_loaded_at
-        description: dbt 加载时间戳
+      - name: _partition_date
+        description: S3 分区日期
+      - name: _loaded_at
+        description: Snowpipe 加载时间
         tests:
           - not_null
-  
+
   - name: stg_orders
-    description: 清洗后的订单数据
+    description: 订单事实表（incremental append）
     columns:
       - name: order_id
         description: 订单唯一标识
         tests:
-          - unique
           - not_null
       - name: customer_id
         description: 客户 ID
         tests:
           - not_null
       - name: status
-        description: 标准化的订单状态（小写）
+        description: 订单状态（小写）
         tests:
           - not_null
           - accepted_values:
@@ -45,16 +46,23 @@ models:
         description: 订单总金额
         tests:
           - not_null
-  
+      - name: _partition_date
+        description: S3 分区日期
+      - name: _loaded_at
+        description: Snowpipe 加载时间
+
   - name: stg_order_items
-    description: 清洗后的订单明细数据
+    description: 订单明细事实表（incremental append）
     columns:
       - name: order_item_id
         description: 订单明细唯一标识
         tests:
-          - unique
           - not_null
       - name: order_id
         description: 订单 ID
         tests:
           - not_null
+      - name: _partition_date
+        description: S3 分区日期
+      - name: _loaded_at
+        description: Snowpipe 加载时间
