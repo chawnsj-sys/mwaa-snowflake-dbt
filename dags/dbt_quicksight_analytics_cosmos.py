@@ -1,13 +1,8 @@
 """
 dbt QuickSight Analytics DAG - 使用 Astronomer Cosmos
 
-完整管道：Ingest (Snowpipe) → Silver (staging) → Gold (marts)
-依赖图：每张表的 ingest 完成后立即触发对应 staging，全部 staging 完成后跑 gold
-
-    start
-      ├→ ingest_customers → stg_customers ─────┐
-      ├→ ingest_orders → stg_orders ───────────┼→ gold_models → end
-      └→ ingest_order_items → stg_order_items ─┘
+分层架构：Silver (staging) → Gold (marts)
+Snowpipe ingest 步骤暂时移除（待 IAM 跨账户信任问题解决后恢复）
 """
 
 import os
@@ -16,7 +11,6 @@ from pathlib import Path
 
 from airflow import DAG
 from airflow.operators.empty import EmptyOperator
-from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
 from airflow.utils.dates import days_ago
 
 from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig, RenderConfig
@@ -73,11 +67,11 @@ default_args = {
 # 创建 DAG
 with DAG(
     dag_id="dbt_quicksight_analytics_cosmos",
-    description="Snowpipe Ingest → dbt Silver → Gold (并行 ingest)",
+    description="dbt Silver → Gold (Snowpipe ingest 待恢复)",
     start_date=days_ago(1),
     schedule_interval="0 8 * * *",
     catchup=False,
-    tags=["dbt", "cosmos", "snowflake", "quicksight", "snowpipe"],
+    tags=["dbt", "cosmos", "snowflake", "quicksight"],
     default_args=default_args,
     max_active_runs=1,
 ) as dag:
@@ -85,60 +79,24 @@ with DAG(
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")
 
-    # ========== Ingest: 并行触发 3 个 Snowpipe ==========
-    ingest_customers = SnowflakeOperator(
-        task_id="ingest_customers",
-        snowflake_conn_id="snowflake_default",
-        sql="ALTER PIPE QUICKSIGHT_DB.RAW_LANDING.PIPE_CUSTOMERS REFRESH PREFIX='customers/dt={{ ds }}/';",
-        warehouse="COMPUTE_WH",
-        database="QUICKSIGHT_DB",
-    )
-
-    ingest_orders = SnowflakeOperator(
-        task_id="ingest_orders",
-        snowflake_conn_id="snowflake_default",
-        sql="ALTER PIPE QUICKSIGHT_DB.RAW_LANDING.PIPE_ORDERS REFRESH PREFIX='orders/dt={{ ds }}/';",
-        warehouse="COMPUTE_WH",
-        database="QUICKSIGHT_DB",
-    )
-
-    ingest_order_items = SnowflakeOperator(
-        task_id="ingest_order_items",
-        snowflake_conn_id="snowflake_default",
-        sql="ALTER PIPE QUICKSIGHT_DB.RAW_LANDING.PIPE_ORDER_ITEMS REFRESH PREFIX='order_items/dt={{ ds }}/';",
-        warehouse="COMPUTE_WH",
-        database="QUICKSIGHT_DB",
-    )
-
-    # ========== Silver: 每个 staging 模型独立，跟在对应 ingest 后面 ==========
-    stg_customers = DbtTaskGroup(
-        group_id="run_stg_customers",
+    # Silver 层 - 增量加载（自动发现所有 tag:staging 模型）
+    silver = DbtTaskGroup(
+        group_id="silver_models",
         project_config=PROJECT_CONFIG,
         profile_config=PROFILE_CONFIG,
         execution_config=EXECUTION_CONFIG,
-        render_config=RenderConfig(select=["stg_customers"]),
-        operator_args={"install_deps": True, "full_refresh": False, "execution_timeout": timedelta(minutes=10)},
+        render_config=RenderConfig(
+            select=["tag:staging"],
+            emit_datasets=True,
+        ),
+        operator_args={
+            "install_deps": True,
+            "full_refresh": False,
+            "execution_timeout": timedelta(minutes=10),
+        },
     )
 
-    stg_orders = DbtTaskGroup(
-        group_id="run_stg_orders",
-        project_config=PROJECT_CONFIG,
-        profile_config=PROFILE_CONFIG,
-        execution_config=EXECUTION_CONFIG,
-        render_config=RenderConfig(select=["stg_orders"]),
-        operator_args={"install_deps": False, "full_refresh": False, "execution_timeout": timedelta(minutes=10)},
-    )
-
-    stg_order_items = DbtTaskGroup(
-        group_id="run_stg_order_items",
-        project_config=PROJECT_CONFIG,
-        profile_config=PROFILE_CONFIG,
-        execution_config=EXECUTION_CONFIG,
-        render_config=RenderConfig(select=["stg_order_items"]),
-        operator_args={"install_deps": False, "full_refresh": False, "execution_timeout": timedelta(minutes=10)},
-    )
-
-    # ========== Gold: 所有 staging 完成后跑 marts ==========
+    # Gold 层 - 增量聚合（自动发现所有 tag:marts 模型）
     gold = DbtTaskGroup(
         group_id="gold_models",
         project_config=PROJECT_CONFIG,
@@ -148,12 +106,11 @@ with DAG(
             select=["tag:marts"],
             emit_datasets=True,
         ),
-        operator_args={"install_deps": False, "full_refresh": False, "execution_timeout": timedelta(minutes=10)},
+        operator_args={
+            "install_deps": False,
+            "full_refresh": False,
+            "execution_timeout": timedelta(minutes=10),
+        },
     )
 
-    # ========== 依赖关系 ==========
-    # 并行 ingest → 各自 staging → 汇聚到 gold
-    start >> ingest_customers >> stg_customers >> gold
-    start >> ingest_orders >> stg_orders >> gold
-    start >> ingest_order_items >> stg_order_items >> gold
-    gold >> end
+    start >> silver >> gold >> end
