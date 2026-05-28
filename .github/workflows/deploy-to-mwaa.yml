@@ -49,3 +49,20 @@ jobs:
       - name: Sync requirements to S3
         run: |
           aws s3 cp requirements/requirements.txt s3://${{ env.BUCKET_NAME }}/requirements.txt
+
+      # 上传 dbt manifest 供 Slim CI 使用（state-based builds）
+      - name: Upload production manifest for Slim CI
+        run: |
+          # 安装 dbt 编译生成 manifest
+          pip install dbt-snowflake -q
+          cd dbt_project && dbt deps --profiles-dir . 2>/dev/null || true
+          dbt compile --profiles-dir . --target prod 2>/dev/null || true
+          # 上传 manifest 到 S3
+          if [ -f target/manifest.json ]; then
+            aws s3 cp target/manifest.json s3://${{ env.BUCKET_NAME }}/dbt-artifacts/manifest.json
+            echo "✅ Production manifest uploaded for Slim CI"
+          fi
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}

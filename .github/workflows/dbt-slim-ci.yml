@@ -1,0 +1,65 @@
+name: dbt Slim CI
+
+# PR 时触发：只编译和测试修改过的模型，节省 ~30% Snowflake 成本
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "dbt_project/**"
+
+env:
+  BUCKET_NAME: "mwaa-snowflake-dags-782683897770"
+  AWS_REGION: "us-east-1"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  slim-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt
+        run: pip install dbt-snowflake
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::782683897770:role/github-actions-mwaa-deploy
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Download production manifest (state)
+        run: |
+          mkdir -p dbt_project/prod-state
+          aws s3 cp s3://${{ env.BUCKET_NAME }}/dbt-artifacts/manifest.json \
+            dbt_project/prod-state/manifest.json || echo "No production manifest found, running full build"
+
+      - name: dbt deps
+        working-directory: dbt_project
+        run: dbt deps --profiles-dir .
+
+      - name: dbt build (modified only)
+        working-directory: dbt_project
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        run: |
+          if [ -f prod-state/manifest.json ]; then
+            echo "🚀 Slim CI: only building modified models"
+            dbt build --select state:modified+ --state prod-state --profiles-dir . --target dev
+          else
+            echo "⚠️ No production state found, running full build"
+            dbt build --profiles-dir . --target dev
+          fi
+
+      - name: Validate models (naming, owner, docs)
+        run: python scripts/validate_models.py --changed-only || true

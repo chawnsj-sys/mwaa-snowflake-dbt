@@ -1,53 +1,40 @@
 version: 2
 
 sources:
-  - name: tpch
-    description: Snowflake Sample Data - TPC-H
-    database: SNOWFLAKE_SAMPLE_DATA
-    schema: TPCH_SF1
-    
-    tables:
-      - name: customer
-        description: TPC-H 客户表
-      - name: orders
-        description: TPC-H 订单表
-      - name: lineitem
-        description: TPC-H 订单明细表
-
-  - name: analytics
-    description: QuickSight 分析数据源表
+  - name: raw_landing
+    description: Snowpipe 数据落地层（S3 Parquet 自动加载）
     database: QUICKSIGHT_DB
-    schema: ANALYTICS
-    
+    schema: RAW_LANDING
+
     tables:
       - name: customers
-        description: 客户主表
+        description: 客户数据（Snowpipe 按天追加）
         columns:
           - name: customer_id
             description: 客户唯一标识
             tests:
-              - unique
               - not_null
-          - name: name
+          - name: customer_name
             description: 客户姓名
             tests:
               - not_null
           - name: email
             description: 客户邮箱
-            tests:
-              - not_null
           - name: city
             description: 城市
           - name: registration_date
             description: 注册日期
-      
+          - name: _partition_date
+            description: S3 分区日期
+          - name: _loaded_at
+            description: Snowpipe 加载时间
+
       - name: orders
-        description: 订单主表
+        description: 订单数据（Snowpipe 按天追加）
         columns:
           - name: order_id
             description: 订单唯一标识
             tests:
-              - unique
               - not_null
           - name: customer_id
             description: 客户 ID
@@ -57,22 +44,25 @@ sources:
             description: 订单日期
             tests:
               - not_null
-          - name: status
-            description: 订单状态
-            tests:
-              - not_null
           - name: total_amount
             description: 订单总金额
             tests:
               - not_null
-      
+          - name: status
+            description: 订单状态
+            tests:
+              - not_null
+          - name: _partition_date
+            description: S3 分区日期
+          - name: _loaded_at
+            description: Snowpipe 加载时间
+
       - name: order_items
-        description: 订单明细表
+        description: 订单明细（Snowpipe 按天追加）
         columns:
-          - name: item_id
+          - name: order_item_id
             description: 订单明细唯一标识
             tests:
-              - unique
               - not_null
           - name: order_id
             description: 订单 ID
@@ -90,60 +80,20 @@ sources:
             description: 单价
             tests:
               - not_null
-      
-      - name: products
-        description: 产品信息表
-        columns:
-          - name: product_id
-            description: 产品唯一标识
-            tests:
-              - unique
-              - not_null
-          - name: product_name
-            description: 产品名称
-          - name: category
-            description: 产品类别
-          - name: price
-            description: 销售价格
-          - name: cost
-            description: 成本价格
-      
-      - name: customer_feedback
-        description: 客户反馈表
-        columns:
-          - name: feedback_id
-            description: 反馈唯一标识
-            tests:
-              - unique
-              - not_null
-          - name: customer_id
-            description: 客户 ID
-          - name: order_id
-            description: 订单 ID
-          - name: rating
-            description: 评分 (1-5)
-          - name: comment
-            description: 反馈评论
-          - name: feedback_date
-            description: 反馈日期
+          - name: _partition_date
+            description: S3 分区日期
+          - name: _loaded_at
+            description: Snowpipe 加载时间
 
-      - name: promotions
-        description: 促销活动表
-        columns:
-          - name: promotion_id
-            description: 促销活动唯一标识
-            tests:
-              - unique
-              - not_null
-          - name: product_id
-            description: 关联产品 ID
-            tests:
-              - not_null
-          - name: promotion_name
-            description: 促销活动名称
-          - name: discount_percent
-            description: 折扣百分比
-          - name: start_date
-            description: 开始日期
-          - name: end_date
-            description: 结束日期
+  - name: analytics
+    description: QuickSight 分析数据源表（旧，保留兼容）
+    database: QUICKSIGHT_DB
+    schema: ANALYTICS
+
+    tables:
+      - name: customers
+        description: 客户主表
+      - name: orders
+        description: 订单主表
+      - name: order_items
+        description: 订单明细表

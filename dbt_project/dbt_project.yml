@@ -31,11 +31,13 @@ models:
     staging:
       +materialized: view
       +schema: staging
+      +query_tag: "dbt__staging__quicksight"
       
     # Marts 层配置
     marts:
       +materialized: table
       +schema: marts
+      +query_tag: "dbt__marts__quicksight"
 
 # 测试配置
 tests:

@@ -16,7 +16,6 @@ quicksight_analytics:
       schema: DEV
       threads: 4
       client_session_keep_alive: False
-      query_tag: dbt_quicksight_dev
       
     prod:
       type: snowflake
@@ -29,4 +28,3 @@ quicksight_analytics:
       schema: PUBLIC
       threads: 8
       client_session_keep_alive: False
-      query_tag: dbt_quicksight_prod
