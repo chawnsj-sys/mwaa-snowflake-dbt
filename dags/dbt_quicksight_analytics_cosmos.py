@@ -92,7 +92,6 @@ with DAG(
         sql="ALTER PIPE QUICKSIGHT_DB.RAW_LANDING.PIPE_CUSTOMERS REFRESH PREFIX='customers/dt={{ ds }}/';",
         warehouse="COMPUTE_WH",
         database="QUICKSIGHT_DB",
-        role="ACCOUNTADMIN",
     )
 
     ingest_orders = SnowflakeOperator(
@@ -101,7 +100,6 @@ with DAG(
         sql="ALTER PIPE QUICKSIGHT_DB.RAW_LANDING.PIPE_ORDERS REFRESH PREFIX='orders/dt={{ ds }}/';",
         warehouse="COMPUTE_WH",
         database="QUICKSIGHT_DB",
-        role="ACCOUNTADMIN",
     )
 
     ingest_order_items = SnowflakeOperator(
@@ -110,7 +108,6 @@ with DAG(
         sql="ALTER PIPE QUICKSIGHT_DB.RAW_LANDING.PIPE_ORDER_ITEMS REFRESH PREFIX='order_items/dt={{ ds }}/';",
         warehouse="COMPUTE_WH",
         database="QUICKSIGHT_DB",
-        role="ACCOUNTADMIN",
     )
 
     # ========== Silver: 每个 staging 模型独立，跟在对应 ingest 后面 ==========
