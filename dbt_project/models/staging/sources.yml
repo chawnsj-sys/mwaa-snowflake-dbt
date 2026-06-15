@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: raw_landing
     description: Snowpipe 数据落地层（S3 Parquet 自动加载）
-    database: MANUFACTURING_DEMO
+    database: DATAOPS_DB
     schema: RAW_LANDING
 
     tables:
@@ -87,7 +87,7 @@ sources:
 
   - name: analytics
     description: 分析数据源表（旧，保留兼容）
-    database: MANUFACTURING_DEMO
+    database: DATAOPS_DB
     schema: ANALYTICS
 
     tables:
