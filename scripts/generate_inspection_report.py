@@ -1459,6 +1459,121 @@ def generate_html(data):
 
     html = template_path.read_text(encoding='utf-8')
 
+    # Replace responsive CSS with enhanced mobile version
+    MOBILE_CSS = """/* ============ Mobile Responsive ============ */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+            .container {
+                border-radius: 8px;
+            }
+            .header {
+                padding: 24px 16px;
+            }
+            .header h1 {
+                font-size: 1.4em;
+            }
+            .header .subtitle {
+                font-size: 0.85em;
+            }
+
+            /* Tab 导航 - 横向滚动 */
+            .tab-nav {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .tab-btn {
+                min-width: 120px;
+                padding: 12px 14px;
+                font-size: 0.85em;
+            }
+
+            /* Tab 内容区 */
+            .tab-content {
+                padding: 16px;
+            }
+
+            /* 评分圆 */
+            .role-score {
+                flex-direction: column;
+                text-align: center;
+                padding: 16px;
+                gap: 12px;
+            }
+            .role-score .score-circle {
+                width: 70px;
+                height: 70px;
+                font-size: 1.5em;
+            }
+            .role-score .score-info h2 {
+                font-size: 1.1em;
+            }
+
+            /* Section */
+            .section-header {
+                padding: 14px 16px;
+                font-size: 1em;
+            }
+            .section-body {
+                padding: 14px;
+            }
+
+            /* Metric Grid - 2列 */
+            .metric-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .metric-card {
+                padding: 12px 8px;
+            }
+            .metric-card .value {
+                font-size: 1.3em;
+            }
+            .metric-card .label {
+                font-size: 0.75em;
+            }
+
+            /* 表格 - 横向滚动 */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.8em;
+            }
+
+            /* Bar Chart */
+            .bar-item {
+                flex-wrap: wrap;
+            }
+            .bar-label {
+                width: 100%;
+                margin-bottom: 4px;
+            }
+            .bar-value {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 4px;
+                font-size: 0.8em;
+            }
+        }"""
+    OLD_RESPONSIVE = """/* Responsive */
+        @media (max-width: 768px) {
+            .tab-nav { flex-wrap: wrap; }
+            .tab-btn { min-width: 120px; font-size: 0.85em; padding: 12px 10px; }
+            .tab-content { padding: 20px; }
+            .header { padding: 24px; }
+            .bar-label { width: 140px; }
+            .role-score { flex-direction: column; text-align: center; }
+            .metric-grid { grid-template-columns: repeat(2, 1fr); }
+        }"""
+    html = html.replace(OLD_RESPONSIVE, MOBILE_CSS)
+
     # Replace engineer tab
     new_eng = generate_engineer_tab(data)
     pattern = r'<div id="tab-engineer" class="tab-content active">.*?</div>\s*\n\s*\n\s*<!-- ={10,} TAB 2'

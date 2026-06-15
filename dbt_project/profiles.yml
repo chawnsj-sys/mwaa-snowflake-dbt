@@ -10,9 +10,9 @@ quicksight_analytics:
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
       password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-      role: DBT_ROLE
-      database: QUICKSIGHT_DB
-      warehouse: COMPUTE_WH
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'MANUFACTURING_DEMO_API_ROLE') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'MANUFACTURING_DEMO') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'MANUFACTURING_DEMO_WH') }}"
       schema: DEV
       threads: 4
       client_session_keep_alive: False
@@ -22,9 +22,9 @@ quicksight_analytics:
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
       password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-      role: DBT_ROLE
-      database: QUICKSIGHT_DB
-      warehouse: COMPUTE_WH
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'MANUFACTURING_DEMO_API_ROLE') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'MANUFACTURING_DEMO') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'MANUFACTURING_DEMO_WH') }}"
       schema: PUBLIC
       threads: 8
       client_session_keep_alive: False
