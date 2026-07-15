@@ -8,7 +8,7 @@ on:
       - "dbt_project/**"
 
 env:
-  BUCKET_NAME: "mwaa-snowflake-dags-782683897770"
+  BUCKET_NAME: ${{ vars.MWAA_S3_BUCKET }}
   AWS_REGION: "us-east-1"
 
 permissions:
@@ -33,7 +33,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::782683897770:role/github-actions-mwaa-deploy
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Download production manifest (state)

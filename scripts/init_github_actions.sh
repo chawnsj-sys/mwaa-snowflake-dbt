@@ -15,11 +15,11 @@
 # ============================================
 
 # ===== 配置变量（根据实际情况修改）=====
-AWS_ACCOUNT_ID="782683897770"
+AWS_ACCOUNT_ID="<YOUR_AWS_ACCOUNT_ID>"
 AWS_REGION="us-east-1"
 GITHUB_ORG="chawnsj-sys"                          # GitHub 用户名或组织名
 GITHUB_REPO="mwaa-snowflake-dbt"                  # GitHub 仓库名
-MWAA_S3_BUCKET="mwaa-snowflake-dags-782683897770" # MWAA S3 桶名
+MWAA_S3_BUCKET="mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>" # MWAA S3 桶名
 ROLE_NAME="github-actions-mwaa-deploy"            # IAM Role 名称
 
 # ===== Step 1: 创建 GitHub OIDC Provider =====

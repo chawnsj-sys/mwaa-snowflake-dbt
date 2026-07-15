@@ -118,11 +118,11 @@ git push origin main
 
 | 环境 | 信息 |
 |------|------|
-| Snowflake Account | RUKQCBI-WS06286 |
+| Snowflake Account | <YOUR_SNOWFLAKE_ACCOUNT> |
 | Snowflake Database | QUICKSIGHT_DB.ANALYTICS |
 | GitHub 仓库 | chawnsj-sys/mwaa-snowflake-dbt |
 | MWAA 环境 | mwaa-snowflake-test (us-east-1) |
-| MWAA S3 桶 | mwaa-snowflake-dags-782683897770 |
+| MWAA S3 桶 | mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID> |
 | MWAA Web UI | https://166710d9-9c44-40bb-b0b8-f186b3cb1d94.c71.airflow.us-east-1.on.aws |
 | GitHub Actions | OIDC → IAM Role: github-actions-mwaa-deploy |
 | EC2 测试 | 44.200.236.239（可选，用于 Airflow 本地测试） |
@@ -197,8 +197,8 @@ dbt test --profiles-dir .             # 运行测试
 git push origin main                  # 触发 GitHub Actions 自动部署
 
 # 手动部署（备用）
-aws s3 sync dags/ s3://mwaa-snowflake-dags-782683897770/dags/ --region us-east-1
-aws s3 sync dbt_project/ s3://mwaa-snowflake-dags-782683897770/dags/dbt_project/ --region us-east-1
+aws s3 sync dags/ s3://mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>/dags/ --region us-east-1
+aws s3 sync dbt_project/ s3://mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>/dags/dbt_project/ --region us-east-1
 
 # 检查 MWAA 状态
 aws mwaa get-environment --name mwaa-snowflake-test --region us-east-1 --query 'Environment.Status'

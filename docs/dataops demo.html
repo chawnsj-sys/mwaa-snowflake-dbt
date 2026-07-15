@@ -198,7 +198,7 @@ Snowflake SQL → Kiro Skill → dbt 模型
         <div class="card">
             <table>
                 <tr><th>配置项</th><th>值</th></tr>
-                <tr><td>S3 桶</td><td><code>s3://snowflake-ingestion-782683897770/</code></td></tr>
+                <tr><td>S3 桶</td><td><code>s3://snowflake-ingestion-<YOUR_AWS_ACCOUNT_ID>/</code></td></tr>
                 <tr><td>数据格式</td><td>Parquet (Snappy)</td></tr>
                 <tr><td>分区方式</td><td><code>&lt;table&gt;/dt=YYYY-MM-DD/</code></td></tr>
                 <tr><td>落地 Schema</td><td><code>QUICKSIGHT_DB.RAW_LANDING</code></td></tr>
@@ -268,7 +268,7 @@ Snowflake SQL → Kiro Skill → dbt 模型
             <h3>Snowflake 用户</h3>
             <table>
                 <tr><th>用户</th><th>角色</th><th>用途</th><th>状态</th></tr>
-                <tr><td><code>mya</code></td><td>ACCOUNTADMIN</td><td>管理员，环境初始化</td><td>✅ 活跃</td></tr>
+                <tr><td><code><YOUR_SNOWFLAKE_USER></code></td><td>ACCOUNTADMIN</td><td>管理员，环境初始化</td><td>✅ 活跃</td></tr>
                 <tr><td><code>alice</code></td><td>DBT_ROLE</td><td>数据工程师，负责客户域模型</td><td>✅ 活跃</td></tr>
                 <tr><td><code>bob</code></td><td>DBT_ROLE</td><td>数据工程师，负责销售域模型</td><td>✅ 活跃</td></tr>
             </table>

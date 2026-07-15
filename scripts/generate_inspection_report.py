@@ -25,8 +25,8 @@ except ImportError:
 # ============================================
 # 配置
 # ============================================
-ACCOUNT = os.environ.get("SNOWFLAKE_ACCOUNT", "RUKQCBI-WS06286")
-USER = os.environ.get("SNOWFLAKE_USER", "mya")
+ACCOUNT = os.environ.get("SNOWFLAKE_ACCOUNT", "<YOUR_SNOWFLAKE_ACCOUNT>")
+USER = os.environ.get("SNOWFLAKE_USER", "<YOUR_SNOWFLAKE_USER>")
 PASSWORD = os.environ.get("SNOWFLAKE_PASSWORD", "")
 WAREHOUSE = "COMPUTE_WH"
 DATABASE = "QUICKSIGHT_DB"

@@ -1,5 +1,5 @@
 -- 订单商品明细 Staging (来自 Snowflake Notebook)
--- 源文件: SNOWFLAKE_TEST_GITHUB/SHENJIN 2026-02-11 11:56:42.ipynb
+-- 源文件: SNOWFLAKE_TEST_GITHUB/<YOUR_SNOWFLAKE_USER> 2026-02-11 11:56:42.ipynb
 
 {{ config(
     materialized='view',

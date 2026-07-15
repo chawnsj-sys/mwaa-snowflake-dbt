@@ -25,3 +25,7 @@ __pycache__/
 
 # Logs
 logs/
+
+# Generated reports
+docs/inspection_report*.html
+docs/inspection_metrics.json

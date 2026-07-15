@@ -14,14 +14,14 @@
 | 环境名 | mwaa-snowflake-test |
 | 区域 | us-east-1 |
 | Airflow 版本 | 2.10.3 |
-| S3 桶 | mwaa-snowflake-dags-782683897770 |
+| S3 桶 | mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID> |
 | Web UI | https://166710d9-9c44-40bb-b0b8-f186b3cb1d94.c71.airflow.us-east-1.on.aws |
-| 执行角色 | arn:aws:iam::782683897770:role/mwaa-snowflake-execution-role |
+| 执行角色 | arn:aws:iam::<YOUR_AWS_ACCOUNT_ID>:role/mwaa-snowflake-execution-role |
 
 ## S3 桶结构
 
 ```
-s3://mwaa-snowflake-dags-782683897770/
+s3://mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>/
 ├── dags/                              # DAG 文件（30 秒自动同步）
 │   ├── dbt_quicksight_analytics_cosmos.py
 │   ├── snowflake_test.py
@@ -82,9 +82,9 @@ export AIRFLOW__COSMOS__ENABLE_CACHE="True"
 | Connection Id | snowflake_default |
 | Connection Type | Snowflake |
 | Schema | PUBLIC |
-| Login | mya |
+| Login | <YOUR_SNOWFLAKE_USER> |
 | Password | (密码) |
-| Extra | `{"account": "RUKQCBI-WS06286", "warehouse": "COMPUTE_WH", "database": "QUICKSIGHT_DB", "role": "ACCOUNTADMIN", "insecure_mode": false}` |
+| Extra | `{"account": "<YOUR_SNOWFLAKE_ACCOUNT>", "warehouse": "COMPUTE_WH", "database": "QUICKSIGHT_DB", "role": "ACCOUNTADMIN", "insecure_mode": false}` |
 
 ## 搭建步骤
 
@@ -99,23 +99,23 @@ export AIRFLOW__COSMOS__ENABLE_CACHE="True"
 ### Step 2：上传 requirements.txt
 
 ```bash
-aws s3 cp requirements/requirements.txt s3://mwaa-snowflake-dags-782683897770/requirements.txt --region us-east-1
+aws s3 cp requirements/requirements.txt s3://mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>/requirements.txt --region us-east-1
 ```
 
 ### Step 3：上传 startup.sh
 
 ```bash
-aws s3 cp scripts/startup.sh s3://mwaa-snowflake-dags-782683897770/startup.sh --region us-east-1
+aws s3 cp scripts/startup.sh s3://mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>/startup.sh --region us-east-1
 ```
 
 ### Step 4：更新 MWAA 环境配置
 
 ```bash
 # 获取 requirements 版本号
-REQ_VERSION=$(aws s3api head-object --bucket mwaa-snowflake-dags-782683897770 --key requirements.txt --region us-east-1 --query 'VersionId' --output text)
+REQ_VERSION=$(aws s3api head-object --bucket mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID> --key requirements.txt --region us-east-1 --query 'VersionId' --output text)
 
 # 获取 startup.sh 版本号
-STARTUP_VERSION=$(aws s3api head-object --bucket mwaa-snowflake-dags-782683897770 --key startup.sh --region us-east-1 --query 'VersionId' --output text)
+STARTUP_VERSION=$(aws s3api head-object --bucket mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID> --key startup.sh --region us-east-1 --query 'VersionId' --output text)
 
 # 更新环境（20-30 分钟）
 aws mwaa update-environment \
@@ -140,8 +140,8 @@ aws mwaa get-environment --name mwaa-snowflake-test --region us-east-1 \
 ### Step 7：上传 DAG 和 dbt 项目
 
 ```bash
-aws s3 sync dags/ s3://mwaa-snowflake-dags-782683897770/dags/ --region us-east-1
-aws s3 sync dbt_project/ s3://mwaa-snowflake-dags-782683897770/dags/dbt_project/ --region us-east-1
+aws s3 sync dags/ s3://mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>/dags/ --region us-east-1
+aws s3 sync dbt_project/ s3://mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>/dags/dbt_project/ --region us-east-1
 ```
 
 或者配置好 GitHub Actions 后直接 `git push`。
@@ -166,7 +166,7 @@ aws s3 sync dbt_project/ s3://mwaa-snowflake-dags-782683897770/dags/dbt_project/
 ### Cosmos 缓存问题
 - 新增/删除模型后清除缓存：
 ```bash
-aws s3 rm s3://mwaa-snowflake-dags-782683897770/cosmos-cache/ --recursive --region us-east-1
+aws s3 rm s3://mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>/cosmos-cache/ --recursive --region us-east-1
 ```
 
 ## 更新依赖的完整流程
@@ -174,10 +174,10 @@ aws s3 rm s3://mwaa-snowflake-dags-782683897770/cosmos-cache/ --recursive --regi
 ```bash
 # 1. 修改 requirements.txt
 # 2. 上传到 S3
-aws s3 cp requirements/requirements.txt s3://mwaa-snowflake-dags-782683897770/requirements.txt --region us-east-1
+aws s3 cp requirements/requirements.txt s3://mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID>/requirements.txt --region us-east-1
 
 # 3. 获取版本号
-VERSION=$(aws s3api head-object --bucket mwaa-snowflake-dags-782683897770 --key requirements.txt --region us-east-1 --query 'VersionId' --output text)
+VERSION=$(aws s3api head-object --bucket mwaa-snowflake-dags-<YOUR_AWS_ACCOUNT_ID> --key requirements.txt --region us-east-1 --query 'VersionId' --output text)
 
 # 4. 触发环境更新
 aws mwaa update-environment --name mwaa-snowflake-test --requirements-s3-object-version "$VERSION" --region us-east-1

@@ -76,9 +76,9 @@ dbt_project/
 pip install dbt-snowflake
 
 # 2. 配置环境变量
-export SNOWFLAKE_ACCOUNT="ZRRXEFT-AGB52047"
-export SNOWFLAKE_USER="shenjin"
-export SNOWFLAKE_PASSWORD="your_password"
+export SNOWFLAKE_ACCOUNT="<YOUR_SNOWFLAKE_ACCOUNT>"
+export SNOWFLAKE_USER="<YOUR_SNOWFLAKE_USER>"
+export SNOWFLAKE_PASSWORD="<YOUR_SNOWFLAKE_PASSWORD>"
 
 # 3. 测试连接
 cd dbt_project

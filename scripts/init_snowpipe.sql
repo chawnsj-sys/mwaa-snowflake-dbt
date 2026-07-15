@@ -34,8 +34,8 @@ CREATE STORAGE INTEGRATION IF NOT EXISTS s3_ingestion_integration
     TYPE = EXTERNAL_STAGE
     STORAGE_PROVIDER = 'S3'
     ENABLED = TRUE
-    STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::782683897770:role/snowflake-ingestion-role'
-    STORAGE_ALLOWED_LOCATIONS = ('s3://snowflake-ingestion-782683897770/');
+    STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::<YOUR_AWS_ACCOUNT_ID>:role/snowflake-ingestion-role'
+    STORAGE_ALLOWED_LOCATIONS = ('s3://snowflake-ingestion-<YOUR_AWS_ACCOUNT_ID>/');
 
 -- 查看 Snowflake 生成的 IAM 信息（用于配置 AWS 信任策略）
 -- DESC INTEGRATION s3_ingestion_integration;
@@ -52,7 +52,7 @@ CREATE FILE FORMAT IF NOT EXISTS RAW_LANDING.parquet_format
 -- ============================================
 CREATE STAGE IF NOT EXISTS RAW_LANDING.s3_ingestion_stage
     STORAGE_INTEGRATION = s3_ingestion_integration
-    URL = 's3://snowflake-ingestion-782683897770/'
+    URL = 's3://snowflake-ingestion-<YOUR_AWS_ACCOUNT_ID>/'
     FILE_FORMAT = RAW_LANDING.parquet_format
     COMMENT = 'S3 数据摄取 Stage（Parquet，按表/日期分区）';
 
